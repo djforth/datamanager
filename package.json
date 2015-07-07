@@ -69,6 +69,6 @@
     "immutable": "^3.7.4",
     "lodash": "^3.10.0",
     "react-jasmine": "git://github.com/djforth/react-jasmine.git",
-    "ajax-es6-module":"git@github.com:djforth/ajax-es6-module.git"
+    "ajax-es6-module":"git://github.com/djforth/ajax-es6-module.git"
   }
 }
