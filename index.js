@@ -174,8 +174,8 @@ var DataManager = (function () {
     value: function filter() {}
   }, {
     key: "fetch",
-    value: function fetch() {
-      var clear = arguments[0] === undefined ? false : arguments[0];
+    value: function fetch(progress) {
+      var clear = arguments[1] === undefined ? false : arguments[1];
 
       if (clear) {
         this.clearAll();
@@ -183,7 +183,7 @@ var DataManager = (function () {
 
       this.setUrl();
 
-      return this.ajaxPromises.fetch().then((function (data) {
+      return this.ajaxPromises.fetch(progress).then((function (data) {
         this.add(data);
         return data;
       }).bind(this))["catch"](function (err) {

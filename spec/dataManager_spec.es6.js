@@ -352,9 +352,15 @@ describe('DataBase', function() {
     });
 
     it("should call setUrl & clearAll true passed", function() {
-      dataManager.fetch(true);
+      dataManager.fetch(null, true);
       expect(dataManager.setUrl).toHaveBeenCalled();
       expect(dataManager.clearAll).toHaveBeenCalled();
+    });
+
+    it("should pass progress function to Ajaxpromise", function() {
+      let progressSpy = jasmine.createSpy("progress");
+      dataManager.fetch(progressSpy);
+      expect(dataManager.ajaxPromises.fetch).toHaveBeenCalledWith(progressSpy);
     });
 
 
