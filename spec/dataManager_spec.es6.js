@@ -1,4 +1,4 @@
-require("babelify/polyfill");
+// require("babelify/polyfill");
 
 const sinon     = require('sinon');
 const _         = require('lodash');
@@ -218,6 +218,202 @@ describe('DataBase', function() {
        let new_obj = dataManager.addDefaults(obj);
        expect(new_obj.get('id')).toEqual("1");
        expect(new_obj.get("surname")).toEqual("Collins");
+    });
+  });
+
+  describe('date functions', function() {
+    let item;
+
+    beforeEach(()=>{
+      dataManager = new DataBase();
+      item = {
+        name:"Phil",
+        foo:"Bar",
+        datetime:"2015-01-18 16:44",
+        date:"2013-01-28"
+      }
+    });
+
+    describe('anyDateStrings', function() {
+      it("should return an array of key that have date or datetime", function() {
+        let keys = dataManager.getDateKeys(item)
+        expect(keys.length).toEqual(2);
+        expect(keys).toContain("datetime");
+        expect(keys).toContain("date");
+        expect(keys).not.toContain("name");
+        expect(keys).not.toContain("foo");
+      });
+    });
+
+    describe('changeDate', function() {
+      let spy, dtfmt, store, date, newItem;
+      beforeEach(()=>{
+        date = new Date(2015, 1, 18);
+        spy = jasmine.createSpyObj("DateFormatter", ["getDate"]);
+        spy.getDate.and.returnValue(date);
+        dtfmt = DataBase.__get__("DateFormatter");
+        store = {
+          getDate : dtfmt.prototype.getDate
+        }
+
+        Object.assign(dtfmt.prototype, spy);
+
+        newItem = dataManager.addDates(item, ["datetime", "date"])
+      });
+
+      afterEach(()=>{
+        Object.assign(dtfmt.prototype, store);
+      })
+
+      it("should call dateFormmater", function() {
+        expect(spy.getDate).toHaveBeenCalled();
+      });
+
+      it("should set dates", function() {
+        expect(_.isDate(newItem.datetime)).toBeTruthy()
+        expect(_.isDate(newItem.date)).toBeTruthy()
+      });
+
+      it("should add dateFormatter", ()=>{
+        expect(_.has(newItem, "datetimeDf")).toBeTruthy();
+        expect(_.has(newItem, "dateDf")).toBeTruthy()
+      })
+    });
+
+    describe('manageDates', function() {
+      let items;
+      beforeEach(()=>{
+        let item2  = _.clone(item);
+        item2.name = "foo2";
+        items = [item, item2];
+
+        spyOn(dataManager, "addDates").and.callFake((it)=>{
+          it.date     = new Date(2013, 1, 28);
+          it.datetime = new Date(2015, 1, 18);
+          return it;
+        });
+      });
+
+      it("should call getDateKeys", function() {
+        spyOn(dataManager, "getDateKeys").and.returnValue([]);
+
+        let dateItems = dataManager.manageDates(items);
+        expect(dataManager.getDateKeys).toHaveBeenCalledWith(items[0]);
+      });
+
+      it("should return array if no date strings", function() {
+        spyOn(dataManager, "getDateKeys").and.returnValue([]);
+
+        let dateItems = dataManager.manageDates(items);
+        expect(dateItems).toEqual(items);
+      });
+
+      it("should call addDates", function() {
+        spyOn(dataManager, "getDateKeys").and.returnValue(["foo"]);
+
+        let dateItems = dataManager.manageDates(items);
+
+        expect(dataManager.addDates).toHaveBeenCalled();
+        expect(dataManager.addDates.calls.count()).toEqual(2);
+
+        let calls = dataManager.addDates.calls.argsFor(0);
+
+        expect(calls).toContain(item)
+        expect(calls).toContain(["foo"])
+
+
+      });
+
+    });
+  });
+
+  describe('sorting functions', function() {
+    let data = [
+      {title:"Ned"   , age:2 , dob:new Date(2013, 0 , 28)},
+      {title:"Rowan" , age:36, dob:new Date(1979, 10, 29)},
+      {title:"Adrian", age:40, dob:new Date(1975, 4 , 12)},
+      {title:"Harry" , age:0 , dob:new Date(2015, 0 , 18)}
+    ];
+
+    let dataIm;
+    beforeEach(()=>{
+      dataManager = new DataBase();
+      dataIm = Immutable.fromJS(data);
+      dataManager.data = dataIm;
+    });
+
+    describe('sortAlgorithm', function() {
+      it("should return -1 if a is less than b", function() {
+        expect(dataManager.sortAlgorithm("A", "B")).toEqual(-1)
+      });
+      it("should return 1 if a is greater than b", function() {
+        expect(dataManager.sortAlgorithm("D", "C")).toEqual(1)
+      });
+
+      it("should return 0 if a is equal to b", function() {
+        expect(dataManager.sortAlgorithm("D", "D")).toEqual(0)
+      });
+    });
+
+    describe('sort ', function() {
+      beforeEach(()=>{
+        spyOn(dataManager, "sortAlgorithm").and.callThrough()
+      })
+      it("should sort by title asc", function() {
+        let sort = dataManager.sort("title");
+
+        let first  = sort.get(0).get('title');
+        let second = sort.get(1).get('title');
+        let third  = sort.get(2).get('title');
+        let last   = sort.get(3).get('title');
+
+        expect(first).toEqual("Adrian");
+        expect(second).toEqual("Harry");
+        expect(third).toEqual("Ned");
+        expect(last).toEqual("Rowan");
+      });
+
+      it("should sort by title decending", function() {
+        let sort = dataManager.sort("title", false);
+
+        let first  = sort.get(0).get('title');
+        let second = sort.get(1).get('title');
+        let third  = sort.get(2).get('title');
+        let last   = sort.get(3).get('title');
+
+        expect(first).toEqual("Rowan");
+        expect(second).toEqual("Ned");
+        expect(third).toEqual("Harry");
+        expect(last).toEqual("Adrian");
+      });
+
+      it("should sort by age ", function() {
+        let sort = dataManager.sort("age");
+
+        let first  = sort.get(0).get('age');
+        let second = sort.get(1).get('age');
+        let third  = sort.get(2).get('age');
+        let last   = sort.get(3).get('age');
+
+        expect(first).toEqual(0);
+        expect(second).toEqual(2);
+        expect(third).toEqual(36);
+        expect(last).toEqual(40);
+      });
+
+      it("should sort by dob ", function() {
+        let sort = dataManager.sort("dob");
+
+        let first  = sort.get(0).get('dob');
+        let second = sort.get(1).get('dob');
+        let third  = sort.get(2).get('dob');
+        let last   = sort.get(3).get('dob');
+
+        expect(first).toEqual(new Date(1975, 4 , 12));
+        expect(second).toEqual(new Date(1979, 10, 29));
+        expect(third).toEqual(new Date(2013, 0 , 28));
+        expect(last).toEqual(new Date(2015, 0 , 18));
+      });
     });
   });
 
@@ -609,147 +805,179 @@ describe('DataBase', function() {
           done();
         }, 100);
       });
+  });
+
+
+  describe('delete/remove', function() {
+    let promise, resolve, reject;
+
+    beforeEach(()=>{
+      dataManager = new DataBase();
+      dataManager.data = Immutable.fromJS([{foo:"bar", id:3}, {foo:"bar", id:2}]);
     });
 
+    describe('remove', function() {
+      it("should return null if not found", function() {
+        let del = dataManager.remove(4);
+        expect(del).toBeNull();
+      });
 
-    describe('delete/remove', function() {
-      let promise, resolve, reject;
+      it("should remove item", function() {
+        let del = dataManager.remove(3);
+        expect(dataManager.data.size).toEqual(1);
+        expect(del.toJS()).toEqual({foo:"bar", id:3});
+      });
+    });
+
+    describe('destroy', function() {
+      // let promise, resolve, reject;
 
       beforeEach(()=>{
-        dataManager = new DataBase();
-        dataManager.data = Immutable.fromJS([{foo:"bar", id:3}, {foo:"bar", id:2}]);
+        promise = new Promise((res, rej)=>{
+          resolve = res;
+          reject  = rej;
+        });
+        spyOn(dataManager, "setUrl");
+        spyOn(dataManager.ajaxPromises, "destroy").and.returnValue(promise);
+        // spyOn(dataManager, "remove").and.returnValue(dataManager.data.get(0));
       });
 
-      describe('remove', function() {
-        it("should return null if not found", function() {
-          let del = dataManager.remove(4);
-          expect(del).toBeNull();
-        });
-
-        it("should remove item", function() {
-          let del = dataManager.remove(3);
-          expect(dataManager.data.size).toEqual(1);
-          expect(del.toJS()).toEqual({foo:"bar", id:3});
-        });
+      it("should return null if no data", function() {
+        spyOn(dataManager, "dataCheck").and.returnValue(false);
+        let del = dataManager.destroy();
+        expect(del).toBeNull();
       });
 
-      describe('destroy', function() {
-        // let promise, resolve, reject;
+      it("should call setUrl", function() {
+        spyOn(dataManager, "remove").and.returnValue(dataManager.data.get(0));
+        spyOn(dataManager, "dataCheck").and.returnValue(true);
 
-        beforeEach(()=>{
-          promise = new Promise((res, rej)=>{
-            resolve = res;
-            reject  = rej;
-          });
-          spyOn(dataManager, "setUrl");
-          spyOn(dataManager.ajaxPromises, "destroy").and.returnValue(promise);
-          // spyOn(dataManager, "remove").and.returnValue(dataManager.data.get(0));
-        });
-
-        it("should return null if no data", function() {
-          spyOn(dataManager, "dataCheck").and.returnValue(false);
-          let del = dataManager.destroy();
-          expect(del).toBeNull();
-        });
-
-        it("should call setUrl", function() {
-          spyOn(dataManager, "remove").and.returnValue(dataManager.data.get(0));
-          spyOn(dataManager, "dataCheck").and.returnValue(true);
-
-          let del = dataManager.destroy(3);
-          expect(dataManager.setUrl).toHaveBeenCalled();
-          expect(dataManager.remove).toHaveBeenCalledWith(3);
-        });
-
-        it("should call remove", function() {
-          spyOn(dataManager, "remove").and.returnValue(dataManager.data.get(0));
-          let del = dataManager.destroy(3);
-          expect(dataManager.remove).toHaveBeenCalledWith(3);
-        });
-
-         it("should call ajaxPromises.destroy", function() {
-          dataManager.destroy(3);
-          expect(dataManager.ajaxPromises.destroy).toHaveBeenCalled();
-
-          // let args = dataManager.ajaxPromises.destory.calls.first().args;
-
-          // expect(args).toContain({foo:"bar", id:3});
-        });
-
-        it("should return success if resolved", function(done) {
-          dataManager.destroy(3).then((suc)=>{
-            expect(suc).toEqual("Success");
-          })
-
-          resolve("Success");
-
-          setTimeout(function() {
-            done();
-          }, 100);
-        });
-
-
-      });
-    });
-
-
-    describe('search', function() {
-
-      let genesis = [
-        {title:"Tony Banks", instruments:" keyboards, backing vocals, guitar"},
-        {title:"Mike Rutherford", instruments:"bass, guitars, backing vocals, bass pedals, twelve-string guitar, cello, electric sitar"},
-        {title:"Phil Collins", instruments:"drums, percussion, lead and backing vocals, vibraphone, drum machine, Simmons drums"},
-        {title:"Anthony Phillips", instruments:"lead guitar, twelve-string guitar, classical guitar, dulcimer, backing vocals"},
-        {title:"Chris Stewart", instruments:"drums, percussion"},
-        {title:"Peter Gabriel", instruments:"lead vocals, flute, tambourine, oboe, bass drum, accordion, theatrics"},
-        {title:"John Silver", instruments:"drums, percussion, backing vocals"},
-        {title:"John Mayhew", instruments:"drums, percussion, backing vocals"},
-        {title:"Mick Barnard", instruments:"guitar"},
-        {title:"Steve Hackett", instruments:"lead guitar, twelve-string guitar, classical guitar, autoharp"},
-        {title:"Ray Wilson", instruments:"lead vocals"},
-        {title:"Bill Bruford", instruments:"drums, percussion"},
-        {title:"Chester Thompson", instruments:"drums, percussion"},
-        {title:"Daryl Stuermer", instruments:"guitars, bass, backing vocals"},
-        {title:"Nir Zidkyahu", instruments:"drums, percussion"},
-        {title:"Nick D'Virgilio", instruments:"drums, percussion"},
-        {title:"Anthony Drennan", instruments:"Silver bass"}
-      ];
-
-      beforeEach(()=>{
-        dataManager = new DataBase();
-        dataManager.data = Immutable.fromJS(genesis).toList();
+        let del = dataManager.destroy(3);
+        expect(dataManager.setUrl).toHaveBeenCalled();
+        expect(dataManager.remove).toHaveBeenCalledWith(3);
       });
 
-      it("should return the correct data if 'John' searched on title", function() {
-        let searched = dataManager.search("john", ["title"]);
-        expect(searched.size).toEqual(2);
+      it("should call remove", function() {
+        spyOn(dataManager, "remove").and.returnValue(dataManager.data.get(0));
+        let del = dataManager.destroy(3);
+        expect(dataManager.remove).toHaveBeenCalledWith(3);
       });
 
-      it("should return the correct data if 'Silver' searched on all", function() {
-        let searched = dataManager.search("silver", ["title", "instruments"]);
-        expect(searched.size).toEqual(2);
+       it("should call ajaxPromises.destroy", function() {
+        dataManager.destroy(3);
+        expect(dataManager.ajaxPromises.destroy).toHaveBeenCalled();
+
+        // let args = dataManager.ajaxPromises.destory.calls.first().args;
+
+        // expect(args).toContain({foo:"bar", id:3});
       });
 
+      it("should return success if resolved", function(done) {
+        dataManager.destroy(3).then((suc)=>{
+          expect(suc).toEqual("Success");
+        })
 
+        resolve("Success");
+
+        setTimeout(function() {
+          done();
+        }, 100);
+      });
 
 
     });
+  });
 
 
-    // it("should return error if rejected", function(done) {
-    //     promise = dataManager.create({foo:"bar", id:1})
-    //     expect(function() {
-    //       promise.catch((err)=>{console.log(err)})
-    //     }).toThrowError("Error")
+  describe('search', function() {
+
+    let genesis = [
+      {title:"Tony Banks", instruments:" keyboards, backing vocals, guitar"},
+      {title:"Mike Rutherford", instruments:"bass, guitars, backing vocals, bass pedals, twelve-string guitar, cello, electric sitar"},
+      {title:"Phil Collins", instruments:"drums, percussion, lead and backing vocals, vibraphone, drum machine, Simmons drums"},
+      {title:"Anthony Phillips", instruments:"lead guitar, twelve-string guitar, classical guitar, dulcimer, backing vocals"},
+      {title:"Chris Stewart", instruments:"drums, percussion"},
+      {title:"Peter Gabriel", instruments:"lead vocals, flute, tambourine, oboe, bass drum, accordion, theatrics"},
+      {title:"John Silver", instruments:"drums, percussion, backing vocals"},
+      {title:"John Mayhew", instruments:"drums, percussion, backing vocals"},
+      {title:"Mick Barnard", instruments:"guitar"},
+      {title:"Steve Hackett", instruments:"lead guitar, twelve-string guitar, classical guitar, autoharp"},
+      {title:"Ray Wilson", instruments:"lead vocals"},
+      {title:"Bill Bruford", instruments:"drums, percussion"},
+      {title:"Chester Thompson", instruments:"drums, percussion"},
+      {title:"Daryl Stuermer", instruments:"guitars, bass, backing vocals"},
+      {title:"Nir Zidkyahu", instruments:"drums, percussion"},
+      {title:"Nick D'Virgilio", instruments:"drums, percussion"},
+      {title:"Anthony Drennan", instruments:"Silver bass"}
+    ];
+
+    beforeEach(()=>{
+      dataManager = new DataBase();
+      dataManager.data = Immutable.fromJS(genesis).toList();
+    });
+
+    it("should return the correct data if 'John' searched on title", function() {
+      let searched = dataManager.search("john", ["title"]);
+      expect(searched.size).toEqual(2);
+    });
+
+    it("should return the correct data if 'Silver' searched on all", function() {
+      let searched = dataManager.search("silver", ["title", "instruments"]);
+      expect(searched.size).toEqual(2);
+    });
+  });
+
+  describe("dateSearch", ()=>{
+    let data = [
+      {title:"Adrian", age:40, dob:new Date(1975, 4 , 12)},
+      {title:"Rowan" , age:36, dob:new Date(1979, 10, 29)},
+      {title:"Ned"   , age:2 , dob:new Date(2013, 0 , 28)},
+      {title:"Harry" , age:0 , dob:new Date(2015, 0 , 18)}
+    ];
+
+    let dataIm = Immutable.fromJS(data);
+
+    beforeEach(()=>{
+      dataManager      = new DataBase();
+      dataManager.data = dataIm;
+      // spyOn(dataManager, "sort").and.returnValue(dataIm);
+    });
+
+    // it("should call sort", function() {
+    //   let sort =  dataManager.dateSearch("dob", new Date(2012, 11, 11), new Date(2015, 10, 22));
+
+    //   expect(dataManager.sort).toHaveBeenCalledWith("dob");
+    // });
+
+    it("should throw error", function() {
+      expect(()=>{
+        dataManager.dateSearch("dob", "foo", "bar");
+      }).toThrowError("Start and finish must be dates");
+    });
+
+    it("should only return items with DOB between 2011 - 2014", ()=> {
+      let search =  dataManager.dateSearch("dob", new Date(2012, 11, 11), new Date(2014, 10, 22));
+
+      expect(search.size).toEqual(1);
+      let item = search.first();
+      expect(item.get("title")).toEqual("Ned");
+    });
+
+    it("should only return items with DOB between 1975 - 1980", ()=> {
+      let search =  dataManager.dateSearch("dob", new Date(1975, 0, 11), new Date(1980, 0, 12));
+
+      expect(search.size).toEqual(2);
+      let item = search.first();
+      expect(item.get("title")).toEqual("Adrian");
+
+      item = search.get(1);
+      expect(item.get("title")).toEqual("Rowan");
+    });
+
+  });
 
 
 
-    //     rejected("Error");
-
-    //     setTimeout(function() {
-    //       done();
-    //     }, 100);
-    //   });
 
 
 

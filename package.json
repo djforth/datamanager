@@ -1,7 +1,7 @@
 {
   "name": "datamanager",
-  "version": "0.0.1",
-  "description": "Datamanager to work with react compounents and flux",
+  "version": "0.0.2",
+  "description": "Datamanager to work with react components and flux",
   "main": "index.js",
   "scripts": {
     "test": "test"
@@ -66,9 +66,10 @@
     "watchify": "^3.2.3"
   },
   "dependencies": {
+    "ajax-es6-module":"git://github.com/djforth/ajax-es6-module.git",
+    "dateformatter":"git://github.com/djforth/dateformatter.git",
     "immutable": "^3.7.4",
     "lodash": "^3.10.0",
-    "react-jasmine": "git://github.com/djforth/react-jasmine.git",
-    "ajax-es6-module":"git://github.com/djforth/ajax-es6-module.git"
+    "react-jasmine": "git://github.com/djforth/react-jasmine.git"
   }
 }
