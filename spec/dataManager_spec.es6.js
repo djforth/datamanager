@@ -8,6 +8,8 @@ const createEl = require('./utils/createElements.es6.js');
 
 const DataBase  = require('../lib/dataManager.es6.js');
 
+const DateFormatter = require("date-formatter");
+
 describe('DataBase', function() {
   let dataManager;
 
@@ -278,6 +280,50 @@ describe('DataBase', function() {
         expect(_.has(newItem, "datetimeDf")).toBeTruthy();
         expect(_.has(newItem, "dateDf")).toBeTruthy()
       })
+    });
+
+    describe('format dates', function() {
+      let date, item, itemIm;
+      beforeEach(()=>{
+        // console.log('dataManager', dataManager);
+        item = {};
+        let k = "dob";
+        let dateFmt = new DateFormatter("2015-01-18 16:44");
+        item[k]   = dateFmt.getDate();
+        let key   = `${k}Df`;
+        item[key] = dateFmt;
+        itemIm    = Immutable.fromJS(item)
+        // console.log(Immutable.isSubset(itemIm))
+        spyOn(dataManager, "findById").and.returnValue(itemIm)
+      })
+
+      it("should call findById if passed number", function() {
+        dataManager.formatDate(1, "dob");
+        expect(dataManager.findById).toHaveBeenCalledWith(1)
+      });
+
+      it("should not call findById if an object is called", function() {
+        dataManager.formatDate(itemIm, "dob");
+        expect(dataManager.findById).not.toHaveBeenCalled()
+      });
+
+      it("should return empty string if bad key passed ", function() {
+        let fmtDate = dataManager.formatDate(itemIm, "foo");
+
+        expect(fmtDate).toEqual("")
+      });
+
+      it("should return formatted date", function() {
+        let fmtDate = dataManager.formatDate(itemIm, "dob");
+
+        expect(fmtDate).toEqual("18/01/2015")
+      });
+
+      it("should return formatted date and time if formatting passed", function() {
+        let fmtDate = dataManager.formatDate(itemIm, "dob", "%A, %d %B %Y at %-l:%M%p");
+
+        expect(fmtDate).toEqual("Sunday, 18 January 2015 at 4:44pm")
+      });
     });
 
     describe('manageDates', function() {
