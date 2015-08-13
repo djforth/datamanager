@@ -14,7 +14,6 @@ var DataManager = (function () {
   function DataManager(defaults) {
     _classCallCheck(this, DataManager);
 
-    this.dateRegExp = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
     this.ajaxPromises = new AjaxPromises();
     this.data = null;
 
@@ -197,6 +196,7 @@ var DataManager = (function () {
     value: function getDateKeys(item) {
       var _this2 = this;
 
+      this.dateRegExp = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
       var dateKeys = [];
       _.forIn(item, function (v, k) {
         var date_match = v.match(_this2.dateRegExp);
