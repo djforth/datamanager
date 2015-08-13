@@ -54,7 +54,7 @@ var DataManager = (function () {
       this.addToHistory();
 
       m = _.isArray(m) ? m : [m];
-
+      m = this.manageDates(m);
       var current = undefined,
           newData = undefined;
       if (this.data) {
