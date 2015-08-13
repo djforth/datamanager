@@ -197,9 +197,11 @@ var DataManager = (function () {
       var dateRegExp = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
       var dateKeys = [];
       _.forIn(item, function (v, k) {
-        var date_match = v.match(dateRegExp);
-        if (!_.isNull(date_match)) {
-          dateKeys.push(k);
+        if (_.isString(v)) {
+          var date_match = v.match(dateRegExp);
+          if (!_.isNull(date_match)) {
+            dateKeys.push(k);
+          }
         }
       });
 
