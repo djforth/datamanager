@@ -194,12 +194,10 @@ var DataManager = (function () {
   }, {
     key: "getDateKeys",
     value: function getDateKeys(item) {
-      var _this2 = this;
-
-      this.dateRegExp = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
+      var dateRegExp = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
       var dateKeys = [];
       _.forIn(item, function (v, k) {
-        var date_match = v.match(_this2.dateRegExp);
+        var date_match = v.match(dateRegExp);
         if (!_.isNull(date_match)) {
           dateKeys.push(k);
         }
@@ -285,7 +283,7 @@ var DataManager = (function () {
   }, {
     key: "manageDates",
     value: function manageDates(items) {
-      var _this3 = this;
+      var _this2 = this;
 
       var date_keys = this.getDateKeys(_.first(items));
       if (_.isEmpty(date_keys)) {
@@ -293,7 +291,7 @@ var DataManager = (function () {
       }
 
       return _.map(items, function (item) {
-        return _this3.addDates(item, date_keys);
+        return _this2.addDates(item, date_keys);
       });
     }
   }, {
@@ -323,13 +321,13 @@ var DataManager = (function () {
   }, {
     key: "search",
     value: function search(val, keys) {
-      var _this4 = this;
+      var _this3 = this;
 
       if (this.dataCheck(val)) {
         var _ret = (function () {
           var regex = new RegExp(val, "i");
           return {
-            v: _this4.data.filter(function (d) {
+            v: _this3.data.filter(function (d) {
               if (keys.length > 1) {
 
                 var values = d.filter(function (v, k) {
@@ -361,7 +359,7 @@ var DataManager = (function () {
   }, {
     key: "sort",
     value: function sort(key) {
-      var _this5 = this;
+      var _this4 = this;
 
       var asc = arguments[1] === undefined ? true : arguments[1];
 
@@ -373,7 +371,7 @@ var DataManager = (function () {
           itemA = itemA.toLowerCase();
           itemB = itemB.toLowerCase();
         }
-        return _this5.sortAlgorithm(itemA, itemB);
+        return _this4.sortAlgorithm(itemA, itemB);
       });
     }
   }, {
@@ -408,7 +406,7 @@ var DataManager = (function () {
   }, {
     key: "update",
     value: function update(id, updates) {
-      var _this6 = this;
+      var _this5 = this;
 
       var sync = arguments[2] === undefined ? false : arguments[2];
 
@@ -417,7 +415,7 @@ var DataManager = (function () {
         this.data = this.data.map((function (d) {
           // console.log(d)
           if (String(d.get("id")) === String(id)) {
-            return _this6.updateItem(d, updates);
+            return _this5.updateItem(d, updates);
           }
 
           return d;
@@ -441,13 +439,13 @@ var DataManager = (function () {
   }, {
     key: "updateAll",
     value: function updateAll(updates) {
-      var _this7 = this;
+      var _this6 = this;
 
       if (this.dataCheck(updates)) {
         this.addToHistory();
 
         this.data = this.data.map((function (d) {
-          return _this7.updateItem(d, updates);
+          return _this6.updateItem(d, updates);
         }).bind(this));
       }
       return null;
