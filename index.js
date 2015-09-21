@@ -267,7 +267,7 @@ var DataManager = (function () {
     value: function getKeys() {
       var hard = arguments[0] === undefined ? false : arguments[0];
 
-      if (!this.keys || hard) {
+      if (this.data.size > 0 && (!this.keys || hard)) {
         var item = this.data.first();
         var k = item.keySeq();
         this.keys = k.toJS();
