@@ -6,7 +6,7 @@ const Immutable = require('immutable');
 
 const createEl = require('./utils/createElements.es6.js');
 
-const DataBase  = require('../lib/dataManager.es6.js');
+const DataBase  = require('../lib/dataManager');
 
 const DateFormatter = require("date-formatter");
 
