@@ -71,7 +71,7 @@ var DataManager = (function () {
     key: "addDates",
     value: function addDates(item, keys) {
       _.forIn(item, function (v, k) {
-        if (_.contains(keys, k)) {
+        if (_.contains(keys, k) && !_.isNull(item)) {
           var dateFmt = new DateFormatter(v);
           item[k] = dateFmt.getDate();
           var key = k + "Df";
