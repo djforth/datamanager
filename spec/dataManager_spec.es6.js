@@ -6,7 +6,7 @@ const Immutable = require('immutable');
 
 const createEl = require('./utils/createElements.es6.js');
 
-const DataBase  = require('../lib/dataManager');
+const DataBase  = require('../src/dataManager');
 
 const DateFormatter = require("date-formatter");
 
@@ -464,16 +464,25 @@ describe('DataBase', function() {
   });
 
   describe('history functions', function() {
-    let d1, d2;
+    let d1, d2, d3;
     beforeEach(()=>{
       d1 = Immutable.List([{bar:"foo"}]);
       d2 = Immutable.List([{foo2:"bar2"}]);
+      d3 = Immutable.List([{foo3:"bar3"}]);
       dataManager =  new DataBase();
       dataManager.history = [d1, d2];
       dataManager.data    = Immutable.List([{foo:"bar"}]);
     });
 
     it("should add to history if there is data", function() {
+      dataManager.addToHistory();
+      expect(dataManager.history.length).toEqual(3);
+    });
+
+    it("should not keep more than 3 to history", function() {
+      dataManager.addToHistory();
+      expect(dataManager.history.length).toEqual(3);
+      dataManager.data = d3;
       dataManager.addToHistory();
       expect(dataManager.history.length).toEqual(3);
     });

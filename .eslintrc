@@ -28,6 +28,7 @@
     "quotes": [1],
     "new-cap": [0],
     "no-console":[1],
+    "no-loop-func":[0],
     "no-undef":[1], //Because of react work around
     "no-underscore-dangle":[0],
     "no-multi-spaces": [0],

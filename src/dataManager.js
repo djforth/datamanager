@@ -25,7 +25,7 @@ class DataManager {
 
   addDates(item, keys){
     _.forIn(item, function(v, k) {
-      if(_.contains(keys, k)){
+      if(_.contains(keys, k)  && !(_.isNull(item) || _.isUndefined(item)){
         let dateFmt = new DateFormatter(v);
         item[k]   = dateFmt.getDate();
         let key   = `${k}Df`;
@@ -57,6 +57,9 @@ class DataManager {
   addToHistory(){
     if(this.data) {
       this.history.push(this.data); //sets up history
+      if(this.history.length > 3){
+        this.history.shift();
+      }
     }
   }
 
@@ -83,7 +86,7 @@ class DataManager {
 
 
   constructor(defaults, ...args){
-
+    // console.log("args", args);
     this.ajaxPromises = new AjaxPromises();
     this.data         = null;
 
