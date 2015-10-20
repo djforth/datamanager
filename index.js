@@ -301,7 +301,7 @@ var DataManager = (function () {
 
       return _.map(items, function (item) {
         var keys = _this2.getDateKeys(item);
-        return _this2.addDates(item, date_keys);
+        return _this2.addDates(item, keys);
       });
     }
   }, {
