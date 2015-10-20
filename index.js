@@ -287,7 +287,14 @@ var DataManager = (function () {
     value: function manageDates(items) {
       var _this2 = this;
 
-      var date_keys = this.getDateKeys(_.first(items));
+      var date_keys = [];
+      var i = 0;
+      // Checks first 20 records
+      do {
+        date_keys = this.getDateKeys(items[i]);
+        i++;
+      } while (_.isEmpty(date_keys) && i < 20);
+
       if (_.isEmpty(date_keys)) {
         return items;
       }
