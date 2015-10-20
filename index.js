@@ -74,11 +74,8 @@ var DataManager = (function () {
         if (_.contains(keys, k) && !_.isNull(item)) {
           var dateFmt = new DateFormatter(v);
           item[k] = dateFmt.getDate();
-          var _key2 = k + "Df";
-          item[_key2] = dateFmt;
-        } else {
-          item[k] = v;
-          item[key] = "";
+          var key = k + "Df";
+          item[key] = dateFmt;
         }
       });
 
@@ -349,9 +346,9 @@ var DataManager = (function () {
 
                 return all.search(regex) > -1;
               } else {
-                var _key3 = keys[0];
-                if (d.has(_key3)) {
-                  var value = d.get(_key3);
+                var key = keys[0];
+                if (d.has(key)) {
+                  var value = d.get(key);
                   return String(value).search(regex) > -1;
                 } else {
                   return false;
