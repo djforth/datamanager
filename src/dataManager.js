@@ -11,21 +11,15 @@ class DataManager {
 
     m = (_.isArray(m)) ? m : [m];
     m = this.manageDates(m);
-    let current, newData;
-    if(this.data){
-      current = this.data.toJS();
-      newData = _.union(current, m);
-    } else {
-      newData = m;
-    }
 
-    this.data = Immutable.fromJS(newData).map((d)=> this.addDefaults(d));
+    let newData = Immutable.fromJS(m).map((d)=> this.addDefaults(d));
+    this.data = (this.data) ? this.data.concat(newData) : newData;
   }
 
 
   addDates(item, keys){
     _.forIn(item, function(v, k) {
-      if(_.contains(keys, k)  && !(_.isNull(item) || _.isUndefined(item)){
+      if(_.contains(keys, k)  && !(_.isNull(item) || _.isUndefined(item))){
         let dateFmt = new DateFormatter(v);
         item[k]   = dateFmt.getDate();
         let key   = `${k}Df`;

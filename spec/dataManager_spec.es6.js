@@ -1,4 +1,4 @@
-require("babelify/polyfill");
+  require("babelify/polyfill");
 
 const sinon     = require('sinon');
 const _         = require('lodash');
@@ -140,7 +140,7 @@ describe('DataBase', function() {
 
     describe('if data already added', function() {
       beforeEach(()=>{
-        dataManager.data = Immutable.fromJS([{foo:"bar"}]);
+        dataManager.data = Immutable.fromJS([{foo:"bar", test:"foo"}]);
       });
 
       it("should add object & create a new Immutable List", function() {
