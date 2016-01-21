@@ -1,10 +1,20 @@
 {
   "name": "datamanager",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Datamanager to work with react components and flux",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "bundle": "browserify lib/dataManager.es6.js -t babelify  --stage 0 --extension=\"es6.js\" -t uglifyify --exclude babelify/polyfill --exclude lodash > dist/datamanager.min.js",
+    "bundle:es6": " babel lib/dataManager.es6.js --out-file index.js --source-maps --stage 0",
+    "bundle:watch": "watchify lib/dataManager.es6.js -t babelify  --stage 0 --extension=\"es6.js\" --exclude babelify/polyfill --exclude lodash -o dist/datamanager.js",
+    "build": "npm run bundle && npm run bundle:es6",
+    "lint": "eslint lib/**",
+    "lint:tests": "eslint spec/**",
+    "test": "npm run lint && ./node_modules/.bin/karma start --browsers PhantomJS --single-run",
+    "test:watch": "karma start --browsers PhantomJS",
+    "test:ie9": "karma start --single-run --browsers \"IE9 - Win7\"",
+    "test:ie10": "karma start --single-run --browsers \"IE10 - Win7\"",
+    "test:mac": "karma start --single-run --browsers Chrome,Firefox,Safari,Opera"
   },
   "repository": {
     "type": "git",
@@ -21,20 +31,6 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/djforth/datamanager/issues"
-  },
-  "scripts": {
-    "bundle": "browserify lib/dataManager.es6.js -t babelify  --stage 0 --extension=\"es6.js\" -t uglifyify --exclude babelify/polyfill --exclude lodash > dist/datamanager.min.js",
-    "bundle:es6": " babel lib/dataManager.es6.js --out-file index.js --source-maps --stage 0",
-    "bundle:watch": "watchify lib/dataManager.es6.js -t babelify  --stage 0 --extension=\"es6.js\" --exclude babelify/polyfill --exclude lodash -o dist/datamanager.js",
-    "build": "npm run bundle && npm run bundle:es6",
-    "lint": "eslint lib/**",
-    "lint:tests": "eslint spec/**",
-    "test":"npm run lint && ./node_modules/.bin/karma start --browsers PhantomJS --single-run",
-    "test:watch": "karma start --browsers PhantomJS",
-    "test:ie9": "karma start --single-run --browsers \"IE9 - Win7\"",
-    "test:ie10": "karma start --single-run --browsers \"IE10 - Win7\"",
-    "test:mac": "karma start --single-run --browsers Chrome,Firefox,Safari,Opera"
-
   },
   "homepage": "https://github.com/djforth/datamanager#readme",
   "devDependencies": {
@@ -66,8 +62,8 @@
     "watchify": "^3.2.3"
   },
   "dependencies": {
-    "ajax-es6-module":"git://github.com/djforth/ajax-es6-module.git",
-    "date-formatter":"git://github.com/djforth/dateformatter.git",
+    "ajax-es6-module": "git://github.com/djforth/ajax-es6-module.git",
+    "date-formatter": "git://github.com/djforth/dateformatter.git",
     "immutable": "^3.7.4",
     "lodash": "^3.10.0",
     "react-jasmine": "git://github.com/djforth/react-jasmine.git"
