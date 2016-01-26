@@ -8,42 +8,9 @@ var Immutable = require("immutable");
 var _ = require("lodash");
 
 var AjaxPromises = require("ajax-es6-module");
-var DateFormatter = require("date-formatter");
+var DateFormatter = require("@djforth/date-formatter");
 
 var DataManager = (function () {
-  function DataManager(defaults) {
-    _classCallCheck(this, DataManager);
-
-    this.ajaxPromises = new AjaxPromises();
-    this.data = null;
-
-    this.history = [];
-    this.keys = null;
-    // this.last     = null;
-    this.cid = _.uniqueId("c");
-
-    // let args = Array.prototype.slice.call(arguments);
-
-    this.defaults = defaults;
-
-    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    if (_.isArray(args[0])) {
-      this.add(args.shift());
-    }
-
-    var f = _.last(args); // If fetch boolean set
-    var fet = _.isBoolean(f) ? args.pop() : false;
-
-    if (args.length > 0) {
-      this.init(args[0], fet);
-    } else {
-      this.init(fet);
-    }
-  }
-
   _createClass(DataManager, [{
     key: "add",
     value: function add(m) {
@@ -130,7 +97,42 @@ var DataManager = (function () {
       this.addToHistory();
       this.data = null;
     }
-  }, {
+  }]);
+
+  function DataManager(defaults) {
+    _classCallCheck(this, DataManager);
+
+    this.ajaxPromises = new AjaxPromises();
+    this.data = null;
+
+    this.history = [];
+    this.keys = null;
+    // this.last     = null;
+    this.cid = _.uniqueId("c");
+
+    // let args = Array.prototype.slice.call(arguments);
+
+    this.defaults = defaults;
+
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    if (_.isArray(args[0])) {
+      this.add(args.shift());
+    }
+
+    var f = _.last(args); // If fetch boolean set
+    var fet = _.isBoolean(f) ? args.pop() : false;
+
+    if (args.length > 0) {
+      this.init(args[0], fet);
+    } else {
+      this.init(fet);
+    }
+  }
+
+  _createClass(DataManager, [{
     key: "create",
     value: function create(data) {
       if (this.dataCheck(data)) {
@@ -180,7 +182,7 @@ var DataManager = (function () {
   }, {
     key: "formatDate",
     value: function formatDate(id, key) {
-      var fmt = arguments[2] === undefined ? "%d/%m/%Y" : arguments[2];
+      var fmt = arguments.length <= 2 || arguments[2] === undefined ? "%d/%m/%Y" : arguments[2];
 
       var item = _.isNumber(id) ? this.findById(id) : id;
       var df = item.get(key + "Df");
@@ -230,7 +232,7 @@ var DataManager = (function () {
   }, {
     key: "fetch",
     value: function fetch(progress) {
-      var clear = arguments[1] === undefined ? false : arguments[1];
+      var clear = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
       if (clear) {
         this.clearAll();
@@ -265,7 +267,7 @@ var DataManager = (function () {
   }, {
     key: "getKeys",
     value: function getKeys() {
-      var hard = arguments[0] === undefined ? false : arguments[0];
+      var hard = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
 
       if (this.data.size > 0 && (!this.keys || hard)) {
         var item = this.data.first();
@@ -371,7 +373,7 @@ var DataManager = (function () {
     value: function sort(key) {
       var _this4 = this;
 
-      var asc = arguments[1] === undefined ? true : arguments[1];
+      var asc = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 
       // this.addToHistory();
       return this.data.sort(function (a, b) {
@@ -418,7 +420,7 @@ var DataManager = (function () {
     value: function update(id, updates) {
       var _this5 = this;
 
-      var sync = arguments[2] === undefined ? false : arguments[2];
+      var sync = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
       if (this.dataCheck(updates)) {
         this.addToHistory();
@@ -473,5 +475,3 @@ var DataManager = (function () {
 })();
 
 module.exports = DataManager;
-
-//# sourceMappingURL=index.js.map

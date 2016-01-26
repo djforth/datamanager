@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "bundle": "browserify lib/dataManager.es6.js -t babelify  --stage 0 --extension=\"es6.js\" -t uglifyify --exclude babelify/polyfill --exclude lodash > dist/datamanager.min.js",
-    "bundle:es6": " babel lib/dataManager.es6.js --out-file index.js --source-maps --stage 0",
+    "bundle:es6": " babel lib/dataManager.es6.js --out-file index.js --stage 0",
     "bundle:watch": "watchify lib/dataManager.es6.js -t babelify  --stage 0 --extension=\"es6.js\" --exclude babelify/polyfill --exclude lodash -o dist/datamanager.js",
     "build": "npm run bundle && npm run bundle:es6",
     "lint": "eslint lib/**",
