@@ -56,16 +56,16 @@
     "karma-safari-launcher": "^0.1.1",
     "karma-story-reporter": "^0.3.1",
     "phantomjs": "^1.9.17",
+    "react-jasmine": "0.1.6",
     "rewireify": "^0.2.1",
     "sinon": "^1.15.4",
     "uglifyify": "^3.0.1",
     "watchify": "^3.2.3"
   },
   "dependencies": {
-    "ajax-es6-module": "git://github.com/djforth/ajax-es6-module.git",
-    "date-formatter": "git://github.com/djforth/dateformatter.git",
-    "immutable": "^3.7.4",
-    "lodash": "^3.10.0",
-    "react-jasmine": "git://github.com/djforth/react-jasmine.git"
+    "ajax-es6-module": "0.0.8",
+    "@djforth/date-formatter": "1.0.3",
+    "immutable": "^3.7.5",
+    "lodash": "^3.10.1"
   }
 }

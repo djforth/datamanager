@@ -8,7 +8,7 @@ const createEl = require('./utils/createElements.es6.js');
 
 const DataBase  = require('../lib/dataManager.es6.js');
 
-const DateFormatter = require("date-formatter");
+const DateFormatter = require("@djforth/date-formatter");
 
 describe('DataBase', function() {
   let dataManager;
