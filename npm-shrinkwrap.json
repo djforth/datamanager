@@ -1,6 +1,6 @@
 {
   "name": "datamanager",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "dependencies": {
     "@djforth/date-formatter": {
       "version": "1.0.3",
