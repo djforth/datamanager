@@ -1,14 +1,14 @@
-require("babelify/polyfill");
+require("babel-polyfill");
 
 const sinon     = require('sinon');
 const _         = require('lodash');
 const Immutable = require('immutable');
 
-const createEl = require('./utils/createElements.es6.js');
+const createEl = require('./utils/createElements');
 
-const DataBase  = require('../lib/dataManager.es6.js');
+const DataBase  = require('../src/dataManager');
 
-const DateFormatter = require("@djforth/date-formatter");
+const Moment    = require("moment-strftime");
 
 describe('DataBase', function() {
   let dataManager;
@@ -248,27 +248,31 @@ describe('DataBase', function() {
     });
 
     describe('changeDate', function() {
-      let spy, dtfmt, store, date, newItem;
+      let spy, spyM, moment, store, date, newItem;
       beforeEach(()=>{
         date = new Date(2015, 1, 18);
-        spy = jasmine.createSpyObj("DateFormatter", ["getDate"]);
-        spy.getDate.and.returnValue(date);
-        dtfmt = DataBase.__get__("DateFormatter");
-        store = {
-          getDate : dtfmt.prototype.getDate
-        }
+        spy  = jasmine.createSpyObj("moment", ["toDate"]);
+        spy.toDate.and.returnValue(date);
+        spyM = jasmine.createSpy("Moment").and.returnValue(spy);
 
-        Object.assign(dtfmt.prototype, spy);
+        moment = DataBase.__set__("Moment", spyM);
+
+        // store = {
+        //   getDate : dtfmt.prototype.getDate
+        // }
+
+        // Object.assign(dtfmt.prototype, spy);
 
         newItem = dataManager.addDates(item, ["datetime", "date"])
       });
 
       afterEach(()=>{
-        Object.assign(dtfmt.prototype, store);
+        moment()
+        // Object.assign(dtfmt.prototype, store);
       })
 
-      it("should call dateFormmater", function() {
-        expect(spy.getDate).toHaveBeenCalled();
+      it("should call moment", function() {
+        expect(spy.toDate).toHaveBeenCalled();
       });
 
       it("should set dates", function() {
@@ -288,8 +292,8 @@ describe('DataBase', function() {
         // console.log('dataManager', dataManager);
         item = {};
         let k = "dob";
-        let dateFmt = new DateFormatter("2015-01-18 16:44");
-        item[k]   = dateFmt.getDate();
+        let dateFmt = Moment("2015-01-18 16:44");
+        item[k]   = dateFmt.toDate();
         let key   = `${k}Df`;
         item[key] = dateFmt;
         itemIm    = Immutable.fromJS(item)
@@ -320,7 +324,7 @@ describe('DataBase', function() {
       });
 
       it("should return formatted date and time if formatting passed", function() {
-        let fmtDate = dataManager.formatDate(itemIm, "dob", "%A, %d %B %Y at %-l:%M%p");
+        let fmtDate = dataManager.formatDate(itemIm, "dob", "%A, %d %B %Y [at] h:%Ma");
 
         expect(fmtDate).toEqual("Sunday, 18 January 2015 at 4:44pm")
       });

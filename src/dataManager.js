@@ -1,8 +1,13 @@
-const Immutable = require("immutable");
-const _         = require("lodash");
+const AjaxPromises = require("ajax-es6-module")
+    , Immutable    = require("immutable")
+    , Moment       = require("moment-strftime");
+// const DateFormatter = require("@djforth/date-formatter");
 
-const AjaxPromises  = require("ajax-es6-module");
-const DateFormatter = require("@djforth/date-formatter");
+//Lodash functions
+const _        = require("lodash/core")
+    , includes = require("lodash/includes")
+    , forIn    = require("lodash/forIn")
+    , union    = require("lodash/union");
 
 class DataManager {
   add(m){
@@ -14,7 +19,7 @@ class DataManager {
     let current, newData;
     if(this.data){
       current = this.data.toJS();
-      newData = _.union(current, m);
+      newData = union(current, m);
     } else {
       newData = m;
     }
@@ -24,10 +29,10 @@ class DataManager {
 
 
   addDates(item, keys){
-    _.forIn(item, function(v, k) {
-      if(_.contains(keys, k) && !_.isNull(item)){
-        let dateFmt = new DateFormatter(v);
-        item[k]   = dateFmt.getDate();
+    forIn(item, function(v, k) {
+      if(includes(keys, k) && !_.isNull(item)){
+        let dateFmt = Moment(v);
+        item[k]   = dateFmt.toDate();
         let key   = `${k}Df`;
         item[key] = dateFmt;
       }
@@ -38,7 +43,7 @@ class DataManager {
 
   addDefaults(d){
     if(this.defaults){
-      _.forIn(this.defaults, (v, k)=> d = d.set(k, v));
+      forIn(this.defaults, (v, k)=> d = d.set(k, v));
     }
     return d;
   }
@@ -162,7 +167,7 @@ class DataManager {
     let df   = item.get(`${key}Df`);
     // console.log("DateFormmater", df)
     if(df){
-      return df.formatDate(fmt);
+      return df.strftime(fmt);
     }
 
     return "";
@@ -171,7 +176,7 @@ class DataManager {
   getDateKeys(item){
     let dateRegExp   = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
     let dateKeys = [];
-    _.forIn(item, (v, k)=>{
+    forIn(item, (v, k)=>{
       if(_.isString(v)){
         let date_match = v.match(dateRegExp);
         if(!_.isNull(date_match)){
@@ -295,7 +300,7 @@ class DataManager {
         if(keys.length > 1){
 
           let values = d.filter((v, k)=>{
-            return _.contains(keys, k);
+            return includes(keys, k);
           });
           let all = values.valueSeq().toJS().join(" ");
 
@@ -369,7 +374,7 @@ class DataManager {
         }
 
         return d;
-      }.bind(this));
+      });
 
       if(sync){
         this.sync(id);
@@ -380,7 +385,7 @@ class DataManager {
   }
 
   updateItem(item, data){
-    _.forIn(data, (v, k)=> item = item.set(k, v));
+    forIn(data, (v, k)=> item = item.set(k, v));
     return item;
   }
 
@@ -390,7 +395,7 @@ class DataManager {
 
       this.data = this.data.map((d)=>{
         return this.updateItem(d, updates);
-      }.bind(this));
+      });
     }
     return null;
   }

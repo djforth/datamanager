@@ -15,7 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-        './spec/*_spec.es6.js'
+        './src/*.js',
+        './spec/*_spec.js'
     ],
 
 
@@ -27,14 +28,24 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        './spec/*_spec.es6.js': [ 'browserify' ]
+        './spec/*_spec.js': [ 'browserify' ],
+        './src/*.js': ['browserify', 'coverage']
     },
 
     browserify: {
       debug: false,
       transform: ['babelify', ['rewireify', { ignore: 'moof' }]],
-      extensions: [ "es6.js"],
+      extensions: [ ".js"],
       bundleDelay: 1000
+    },
+
+    coverageReporter: {
+      instrumenters: { isparta : require('isparta') },
+      instrumenter: {
+        '**/*.js': 'isparta'
+      },
+      type : 'html',
+      dir : 'coverage/'
     },
 
 

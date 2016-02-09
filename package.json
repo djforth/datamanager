@@ -3,17 +3,18 @@
   "version": "0.0.18",
   "description": "Datamanager to work with react components and flux",
   "main": "index.js",
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "scripts": {
-    "bundle": "browserify lib/dataManager.es6.js -t babelify  --stage 0 --extension=\"es6.js\" -t uglifyify --exclude babelify/polyfill --exclude lodash > dist/datamanager.min.js",
-    "bundle:es6": " babel lib/dataManager.es6.js --out-file index.js --stage 0",
-    "bundle:watch": "watchify lib/dataManager.es6.js -t babelify  --stage 0 --extension=\"es6.js\" --exclude babelify/polyfill --exclude lodash -o dist/datamanager.js",
-    "build": "npm run bundle && npm run bundle:es6",
+    "build": "babel src -x '.js'  -d lib",
+    "build:watch": "babel src -x '.js' -w --source-maps  -d lib",
     "lint": "eslint lib/**",
     "lint:tests": "eslint spec/**",
     "test": "npm run lint && ./node_modules/.bin/karma start --browsers PhantomJS --single-run",
     "test:watch": "karma start --browsers PhantomJS",
-    "test:ie9": "karma start --single-run --browsers \"IE9 - Win7\"",
-    "test:ie10": "karma start --single-run --browsers \"IE10 - Win7\"",
     "test:mac": "karma start --single-run --browsers Chrome,Firefox,Safari,Opera"
   },
   "repository": {
@@ -34,38 +35,37 @@
   },
   "homepage": "https://github.com/djforth/datamanager#readme",
   "devDependencies": {
-    "babel": "^5.6.14",
-    "babel-eslint": "^3.1.21",
-    "babelify": "^6.1.2",
-    "bower": "^1.4.1",
-    "browser-sync": "^2.7.13",
-    "browserify": "^10.2.4",
-    "eslint": "^0.24.0",
-    "jasmine-core": "^2.3.4",
-    "karma": "^0.12.37",
-    "karma-babel-preprocessor": "^5.2.1",
-    "karma-browserify": "^4.2.1",
-    "karma-chrome-launcher": "^0.2.0",
-    "karma-coverage": "^0.4.2",
-    "karma-firefox-launcher": "^0.1.6",
-    "karma-ie-launcher": "^0.2.0",
-    "karma-ievms": "0.0.4",
-    "karma-jasmine": "^0.3.6",
-    "karma-opera-launcher": "^0.2.0",
-    "karma-phantomjs-launcher": "^0.2.0",
+    "@djforth/angular-jasmine-helpers": "^1.0.7",
+    "ajax-es6-module": "1.0.1",
+    "babel": "^6.3.26",
+    "babel-cli": "^6.4.5",
+    "babel-polyfill": "^6.3.14",
+    "babel-preset-es2015": "^6.3.13",
+    "babelify": "^7.2.0",
+    "browserify": "^13.0.0",
+    "isparta": "^4.0.0",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.19",
+    "karma-browserify": "^5.0.1",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-coverage": "^0.5.3",
+    "karma-firefox-launcher": "^0.1.7",
+    "karma-jasmine": "^0.3.7",
+    "karma-phantomjs-launcher": "^1.0.0",
     "karma-safari-launcher": "^0.1.1",
     "karma-story-reporter": "^0.3.1",
-    "phantomjs": "^1.9.17",
-    "react-jasmine": "0.1.6",
-    "rewireify": "^0.2.1",
-    "sinon": "^1.15.4",
-    "uglifyify": "^3.0.1",
-    "watchify": "^3.2.3"
+    "lodash": "^4.3.0",
+    "moment": "^2.10.6",
+    "moment-strftime": "^0.1.5",
+    "phantomjs-prebuilt": "^2.1.3",
+    "rewireify": "^0.2.5",
+    "sinon": "^1.17.3",
+    "watchify": "^3.7.0"
   },
-  "dependencies": {
-    "ajax-es6-module": "0.0.8",
-    "@djforth/date-formatter": "1.0.3",
-    "immutable": "^3.7.5",
-    "lodash": "^3.10.1"
+  "peerDependencies": {
+    "ajax-es6-module": "1.0.1",
+    "lodash": "^4.3.0",
+    "moment": "^2.10.6",
+    "moment-strftime": "^0.1.5"
   }
 }
