@@ -1,6 +1,6 @@
 {
   "name": "datamanager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Datamanager to work with react components and flux",
   "main": "index.js",
   "babel": {
