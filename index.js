@@ -1,4 +1,4 @@
 
-var datamanager = require("lib/dataManager")
+var datamanager = require("./lib/dataManager")
 
 module.exports = datamanager;
