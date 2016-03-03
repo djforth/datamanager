@@ -39,6 +39,8 @@ module.exports = function(config) {
       bundleDelay: 1000
     },
 
+
+
     coverageReporter: {
       instrumenters: { isparta : require('isparta') },
       instrumenter: {
