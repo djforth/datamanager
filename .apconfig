@@ -1,0 +1,5 @@
+{
+  "karma": {
+    "input": "./spec/dataManager_spec.js"
+  }
+}
