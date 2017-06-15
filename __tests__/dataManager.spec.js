@@ -1,6 +1,6 @@
 // const sinon     = require('sinon');
 import _ from 'lodash';
-import Immutable from 'immutable';
+import Immutable, {List, Map} from 'immutable';
 
 // const createEl = require('./utils/createElements');
 
@@ -120,7 +120,7 @@ describe('DataBase', function() {
     it('should create immutable list from list', function() {
       dataManager.add({foo:'bar'});
 
-      expect(Immutable.List.isList(dataManager.data)).toBeTruthy();
+      expect(List.isList(dataManager.data)).toBeTruthy();
       expect(dataManager.addDefaults).toHaveBeenCalled();
       expect(dataManager.data.get(0).toJS()).toEqual({foo:'bar', test:'foo'});
     });
@@ -128,31 +128,30 @@ describe('DataBase', function() {
     it('should create immutable list from array', function() {
       dataManager.add([{foo:'bar'}, {bar:'foo'}]);
 
-      expect(Immutable.List.isList(dataManager.data)).toBeTruthy();
+      expect(List.isList(dataManager.data)).toBeTruthy();
       expect(dataManager.addDefaults).toHaveBeenCalled();
       expect(dataManager.data.get(0).toJS()).toEqual({foo:'bar', test:'foo'});
     });
 
     describe('if data already added', function() {
       beforeEach(()=>{
-        dataManager.data = Immutable.fromJS([{foo:'bar'}]);
+        dataManager.data = Immutable.fromJS([{id:0, foo:'bar'}]);
       });
 
       it('should add object & create a new Immutable List', function() {
-        dataManager.add({bar:'foo'});
+        dataManager.add({id: 1, bar: 'foo'});
 
-        expect(Immutable.List.isList(dataManager.data)).toBeTruthy();
+        expect(List.isList(dataManager.data)).toBeTruthy();
         expect(dataManager.addDefaults).toHaveBeenCalled();
 
         expect(dataManager.history.length).toEqual(1);
         expect(dataManager.history[0].size).toEqual(1);
-
-        expect(dataManager.data.get(0).toJS()).toEqual({foo:'bar', test:'foo'});
+        expect(dataManager.data.get(0).toJS()).toEqual({id: 0, foo: 'bar', test:'foo'});
         expect(dataManager.data.size).toEqual(2);
       });
 
       it('should add array & create a new Immutable List', function() {
-        dataManager.add([{bar:'foo'}, {phil:'colins'}]);
+        dataManager.add([{id: 1, bar:'foo'}, {id: 3, phil:'colins'}]);
 
         expect(Immutable.List.isList(dataManager.data)).toBeTruthy();
         expect(dataManager.addDefaults).toHaveBeenCalled();
@@ -165,15 +164,17 @@ describe('DataBase', function() {
       });
 
       it('should not add if already in array', function() {
-        dataManager.add([{bar:'foo'}]);
+        dataManager.add([{id: 0, foo:'bar'}, {id: 1, foo:'bar'}]);
 
         expect(Immutable.List.isList(dataManager.data)).toBeTruthy();
         expect(dataManager.addDefaults).toHaveBeenCalled();
 
         expect(dataManager.history.length).toEqual(1);
         expect(dataManager.history[0].size).toEqual(1);
-
-        // expect(dataManager.data.toArray()).toEqual([{foo:'bar', test:'test'}, {bar:'foo', test:'test'}]);
+        console.log(dataManager.data.get(0).toJS())
+        expect(dataManager.data.get(0).toJS()).toEqual({id: 0 , foo:'bar', test:'foo'});
+        expect(dataManager.data.get(1).toJS()).toEqual({id: 1 , foo:'bar', test:'foo'})
+        // , {id: 1, bar:'foo', test:'foo'}]);
         expect(dataManager.data.size).toEqual(2);
       });
     });

@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'lodash/map', 'lodash/isEmpty', 'lodash/isFunction', 'lodash/isString', 'lodash/isNumber', 'lodash/isBoolean', 'lodash/last', 'lodash/isDate', 'lodash/uniqueId', 'lodash/isNull', 'lodash/includes', 'lodash/forIn', 'lodash/isArray', 'immutable', 'ajax-es6-module', 'moment-strftime'], factory);
+    define(['module', 'exports', 'lodash/map', 'lodash/isEmpty', 'lodash/isFunction', 'lodash/isString', 'lodash/isNumber', 'lodash/isBoolean', 'lodash/last', 'lodash/isDate', 'lodash/isNull', 'lodash/forIn', 'lodash/isArray', 'lodash/includes', 'lodash/uniqueId', 'immutable', 'ajax-es6-module', 'moment-strftime'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('lodash/map'), require('lodash/isEmpty'), require('lodash/isFunction'), require('lodash/isString'), require('lodash/isNumber'), require('lodash/isBoolean'), require('lodash/last'), require('lodash/isDate'), require('lodash/uniqueId'), require('lodash/isNull'), require('lodash/includes'), require('lodash/forIn'), require('lodash/isArray'), require('immutable'), require('ajax-es6-module'), require('moment-strftime'));
+    factory(module, exports, require('lodash/map'), require('lodash/isEmpty'), require('lodash/isFunction'), require('lodash/isString'), require('lodash/isNumber'), require('lodash/isBoolean'), require('lodash/last'), require('lodash/isDate'), require('lodash/isNull'), require('lodash/forIn'), require('lodash/isArray'), require('lodash/includes'), require('lodash/uniqueId'), require('immutable'), require('ajax-es6-module'), require('moment-strftime'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod, mod.exports, global.map, global.isEmpty, global.isFunction, global.isString, global.isNumber, global.isBoolean, global.last, global.isDate, global.uniqueId, global.isNull, global.includes, global.forIn, global.isArray, global.immutable, global.ajaxEs6Module, global.momentStrftime);
+    factory(mod, mod.exports, global.map, global.isEmpty, global.isFunction, global.isString, global.isNumber, global.isBoolean, global.last, global.isDate, global.isNull, global.forIn, global.isArray, global.includes, global.uniqueId, global.immutable, global.ajaxEs6Module, global.momentStrftime);
     global.dataManager = mod.exports;
   }
-})(this, function (module, exports, _map2, _isEmpty2, _isFunction2, _isString2, _isNumber2, _isBoolean2, _last2, _isDate2, _uniqueId2, _isNull2, _includes2, _forIn2, _isArray2, _immutable, _ajaxEs6Module, _momentStrftime) {
+})(this, function (module, exports, _map2, _isEmpty2, _isFunction2, _isString2, _isNumber2, _isBoolean2, _last2, _isDate2, _isNull2, _forIn2, _isArray2, _includes2, _uniqueId2, _immutable, _ajaxEs6Module, _momentStrftime) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -33,15 +33,15 @@
 
   var _isDate3 = _interopRequireDefault(_isDate2);
 
-  var _uniqueId3 = _interopRequireDefault(_uniqueId2);
-
   var _isNull3 = _interopRequireDefault(_isNull2);
-
-  var _includes3 = _interopRequireDefault(_includes2);
 
   var _forIn3 = _interopRequireDefault(_forIn2);
 
   var _isArray3 = _interopRequireDefault(_isArray2);
+
+  var _includes3 = _interopRequireDefault(_includes2);
+
+  var _uniqueId3 = _interopRequireDefault(_uniqueId2);
 
   var _immutable2 = _interopRequireDefault(_immutable);
 
@@ -79,6 +79,43 @@
     };
   }();
 
+  // const DateFormatter = require("@djforth/date-formatter");
+  var addIds = function addIds(data) {
+    return data.map(function (d) {
+      if (d.has('id')) return d;
+      return d.set('id', (0, _uniqueId3.default)());
+    });
+  };
+
+  var mergeList = function mergeList(current, merge) {
+    return current.map(function (data) {
+      var merger = merge.find(function (m) {
+        return data.get('id') === m.get('id');
+      });
+      if (merger) return data.merge(merger);
+      return data;
+    });
+  };
+
+  var unionLists = function unionLists(current, update) {
+    var ids = current.map(function (d) {
+      return d.get('id');
+    }).toArray();
+    var data = addIds(update);
+    console.log('data', data.toJS());
+    var merge = data.filter(function (d) {
+      return (0, _includes3.default)(ids, d.get('id'));
+    });
+    console.log('merge', merge.toJS());
+    var adding = data.filter(function (d) {
+      console.log((0, _includes3.default)(ids, d.get('id')));
+      return !(0, _includes3.default)(ids, d.get('id'));
+    });
+    var newData = mergeList(current, merge);
+    console.log(newData.concat(adding).toJS(), adding.toJS());
+    return newData.concat(adding);
+  };
+
   var DataManager = function () {
     _createClass(DataManager, [{
       key: 'add',
@@ -90,16 +127,17 @@
 
         m = (0, _isArray3.default)(m) ? m : [m];
         m = this.manageDates(m);
-        var current = void 0,
-            newData = void 0;
+        var newData = void 0;
+        var adding = _immutable2.default.fromJS(m);
+
         if (this.data) {
-          current = this.data.toJS();
-          newData = union(current, m);
+          newData = unionLists(this.data, adding);
+          console.log('TEST', newData.toJS(), this.data.toJS(), adding.toJS());
         } else {
-          newData = m;
+          newData = adding;
         }
 
-        this.data = _immutable2.default.fromJS(newData).map(function (d) {
+        this.data = newData.map(function (d) {
           return _this.addDefaults(d);
         });
       }

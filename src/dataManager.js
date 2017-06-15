@@ -3,10 +3,39 @@ import _ from 'lodash';
 
 import AjaxPromises from 'ajax-es6-module';
 // import DateFormatter from '@djforth/date-formatter';
-import Moment from "moment-strftime";
+import Moment from 'moment-strftime';
 // const DateFormatter = require("@djforth/date-formatter");
+const addIds = (data)=>{
+  return data.map((d)=>{
+    if (d.has('id')) return d;
+    return d.set('id', _.uniqueId());
+  });
+};
 
-//Lodash functions
+const mergeList = (current, merge)=>{
+  return current.map((data)=>{
+    let merger = merge.find((m)=>data.get('id') === m.get('id'));
+    if (merger) return data.merge(merger);
+    return data;
+  });
+};
+
+const unionLists = (current, update)=>{
+  let ids = current.map((d)=>d.get('id')).toArray();
+  let data = addIds(update);
+  console.log('data', data.toJS())
+  let merge = data.filter((d)=>{
+    return _.includes(ids, d.get('id'));
+  });
+  console.log('merge', merge.toJS())
+  let adding = data.filter((d)=>{
+    console.log(_.includes(ids, d.get('id')));
+    return !_.includes(ids, d.get('id'));
+  });
+  let newData = mergeList(current, merge);
+  console.log(newData.concat(adding).toJS(), adding.toJS())
+  return newData.concat(adding);
+};
 
 export default class DataManager{
   add(m){
@@ -15,21 +44,23 @@ export default class DataManager{
 
     m = (_.isArray(m)) ? m : [m];
     m = this.manageDates(m);
-    let current, newData;
+    let newData;
+    let adding = Immutable.fromJS(m);
+
     if (this.data){
-      current = this.data.toJS();
-      newData = _.union(current, m);
+      newData = unionLists(this.data, adding);
+      console.log('TEST', newData.toJS(), this.data.toJS(), adding.toJS())
     } else {
-      newData = m;
+      newData = adding;
     }
 
-    this.data = Immutable.fromJS(newData).map((d)=>this.addDefaults(d));
+    this.data = newData.map((d)=>this.addDefaults(d));
   }
 
 
   addDates(item, keys){
-    _.forIn(item, function(v, k) {
-      if(_.includes(keys, k) && !_.isNull(item)){
+    _.forIn(item, (v, k)=>{
+      if (_.includes(keys, k) && !_.isNull(item)){
         let dateFmt = Moment(v);
         item[k]   = dateFmt.toDate();
         let key   = `${k}Df`;
