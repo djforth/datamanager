@@ -2,7 +2,11 @@ import Immutable from 'immutable';
 import _ from 'lodash';
 
 import AjaxPromises from 'ajax-es6-module';
-import DateFormatter from '@djforth/date-formatter';
+// import DateFormatter from '@djforth/date-formatter';
+import Moment from "moment-strftime";
+// const DateFormatter = require("@djforth/date-formatter");
+
+//Lodash functions
 
 export default class DataManager{
   add(m){
@@ -24,10 +28,10 @@ export default class DataManager{
 
 
   addDates(item, keys){
-    _.forIn(item, function(v, k){
-      if (_.includes(keys, k) && !_.isNull(item)){
-        let dateFmt = new DateFormatter(v);
-        item[k]   = dateFmt.getDate();
+    _.forIn(item, function(v, k) {
+      if(_.includes(keys, k) && !_.isNull(item)){
+        let dateFmt = Moment(v);
+        item[k]   = dateFmt.toDate();
         let key   = `${k}Df`;
         item[key] = dateFmt;
       }
@@ -37,8 +41,9 @@ export default class DataManager{
   }
 
   addDefaults(d){
+
     if (this.defaults){
-      _.forIn(this.defaults, (v, k)=>d = d.set(k, v));
+      _.forIn(this.defaults, (v, k)=> d = d.set(k, v));
     }
     return d;
   }
@@ -154,8 +159,8 @@ export default class DataManager{
     let item = (_.isNumber(id)) ? this.findById(id) : id;
     let df   = item.get(`${key}Df`);
     // console.log("DateFormmater", df)
-    if (df){
-      return df.formatDate(fmt);
+    if(df){
+      return df.strftime(fmt);
     }
 
     return '';
@@ -167,7 +172,7 @@ export default class DataManager{
     /* eslint-enable */
     let dateKeys = [];
     _.forIn(item, (v, k)=>{
-      if (_.isString(v)){
+      if(_.isString(v)){
         let date_match = v.match(dateRegExp);
         if (!_.isNull(date_match)){
           dateKeys.push(k);

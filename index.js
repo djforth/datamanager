@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'exports', 'lodash/map', 'lodash/isEmpty', 'lodash/isFunction', 'lodash/isString', 'lodash/isNumber', 'lodash/isBoolean', 'lodash/last', 'lodash/isDate', 'lodash/uniqueId', 'lodash/isNull', 'lodash/includes', 'lodash/forIn', 'lodash/union', 'lodash/isArray', 'immutable', 'ajax-es6-module', '@djforth/date-formatter'], factory);
+    define(['module', 'exports', 'lodash/map', 'lodash/isEmpty', 'lodash/isFunction', 'lodash/isString', 'lodash/isNumber', 'lodash/isBoolean', 'lodash/last', 'lodash/isDate', 'lodash/uniqueId', 'lodash/isNull', 'lodash/includes', 'lodash/forIn', 'lodash/isArray', 'immutable', 'ajax-es6-module', 'moment-strftime'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, exports, require('lodash/map'), require('lodash/isEmpty'), require('lodash/isFunction'), require('lodash/isString'), require('lodash/isNumber'), require('lodash/isBoolean'), require('lodash/last'), require('lodash/isDate'), require('lodash/uniqueId'), require('lodash/isNull'), require('lodash/includes'), require('lodash/forIn'), require('lodash/union'), require('lodash/isArray'), require('immutable'), require('ajax-es6-module'), require('@djforth/date-formatter'));
+    factory(module, exports, require('lodash/map'), require('lodash/isEmpty'), require('lodash/isFunction'), require('lodash/isString'), require('lodash/isNumber'), require('lodash/isBoolean'), require('lodash/last'), require('lodash/isDate'), require('lodash/uniqueId'), require('lodash/isNull'), require('lodash/includes'), require('lodash/forIn'), require('lodash/isArray'), require('immutable'), require('ajax-es6-module'), require('moment-strftime'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod, mod.exports, global.map, global.isEmpty, global.isFunction, global.isString, global.isNumber, global.isBoolean, global.last, global.isDate, global.uniqueId, global.isNull, global.includes, global.forIn, global.union, global.isArray, global.immutable, global.ajaxEs6Module, global.dateFormatter);
+    factory(mod, mod.exports, global.map, global.isEmpty, global.isFunction, global.isString, global.isNumber, global.isBoolean, global.last, global.isDate, global.uniqueId, global.isNull, global.includes, global.forIn, global.isArray, global.immutable, global.ajaxEs6Module, global.momentStrftime);
     global.dataManager = mod.exports;
   }
-})(this, function (module, exports, _map2, _isEmpty2, _isFunction2, _isString2, _isNumber2, _isBoolean2, _last2, _isDate2, _uniqueId2, _isNull2, _includes2, _forIn2, _union2, _isArray2, _immutable, _ajaxEs6Module, _dateFormatter) {
+})(this, function (module, exports, _map2, _isEmpty2, _isFunction2, _isString2, _isNumber2, _isBoolean2, _last2, _isDate2, _uniqueId2, _isNull2, _includes2, _forIn2, _isArray2, _immutable, _ajaxEs6Module, _momentStrftime) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -41,15 +41,13 @@
 
   var _forIn3 = _interopRequireDefault(_forIn2);
 
-  var _union3 = _interopRequireDefault(_union2);
-
   var _isArray3 = _interopRequireDefault(_isArray2);
 
   var _immutable2 = _interopRequireDefault(_immutable);
 
   var _ajaxEs6Module2 = _interopRequireDefault(_ajaxEs6Module);
 
-  var _dateFormatter2 = _interopRequireDefault(_dateFormatter);
+  var _momentStrftime2 = _interopRequireDefault(_momentStrftime);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -96,7 +94,7 @@
             newData = void 0;
         if (this.data) {
           current = this.data.toJS();
-          newData = (0, _union3.default)(current, m);
+          newData = union(current, m);
         } else {
           newData = m;
         }
@@ -110,8 +108,8 @@
       value: function addDates(item, keys) {
         (0, _forIn3.default)(item, function (v, k) {
           if ((0, _includes3.default)(keys, k) && !(0, _isNull3.default)(item)) {
-            var dateFmt = new _dateFormatter2.default(v);
-            item[k] = dateFmt.getDate();
+            var dateFmt = (0, _momentStrftime2.default)(v);
+            item[k] = dateFmt.toDate();
             var key = k + 'Df';
             item[key] = dateFmt;
           }
@@ -122,6 +120,7 @@
     }, {
       key: 'addDefaults',
       value: function addDefaults(d) {
+
         if (this.defaults) {
           (0, _forIn3.default)(this.defaults, function (v, k) {
             return d = d.set(k, v);
@@ -257,7 +256,7 @@
         var df = item.get(key + 'Df');
         // console.log("DateFormmater", df)
         if (df) {
-          return df.formatDate(fmt);
+          return df.strftime(fmt);
         }
 
         return '';

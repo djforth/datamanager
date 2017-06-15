@@ -1,6 +1,6 @@
 {
   "name": "datamanager",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Datamanager to work with react components and flux",
   "main": "index.js",
   "scripts": {
@@ -12,23 +12,9 @@
     "test:mac": "asset-pipeline-karma -b",
     "test:watch": "asset-pipeline-karma -w"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/djforth/datamanager.git"
-  },
-  "keywords": [
-    "react",
-    "data",
-    "management",
-    "flux",
-    "immutable.js"
-  ],
-  "author": "Adrian Stainforth",
+  "repository": "git@github.com:djforth/datamanager.git",
+  "author": "Adrian Stainforth <adrian.stainforth@gmail.com>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/djforth/datamanager/issues"
-  },
-  "homepage": "https://github.com/djforth/datamanager#readme",
   "devDependencies": {
     "@djforth/ap_karma_wp": "^2.1.0",
     "@djforth/ap_utils": "^3.1.2",
@@ -59,15 +45,14 @@
     "immutable": "^3.8.1",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "sinon": "^2.3.4"
+    "moment-strftime": "^0.2.2",
+    "sinon": "^2.3.4",
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.4.5"
   },
   "peerDependencies": {
     "ajax-es6-module": ">=1.1.1",
-    "immutable": "^3.7.5",
-    "lodash": "^3.10.1"
-  },
-  "dependencies": {
-    "webpack": "^2.6.1",
-    "webpack-dev-server": "^2.4.5"
+    "immutable": "^3.8.1",
+    "lodash": "^4.17.4"
   }
 }
