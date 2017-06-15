@@ -1,31 +1,31 @@
-const Immutable = require("immutable");
-const _         = require("lodash");
+import Immutable from 'immutable';
+import _ from 'lodash';
 
-const AjaxPromises  = require("ajax-es6-module");
-const DateFormatter = require("@djforth/date-formatter");
+import AjaxPromises from 'ajax-es6-module';
+import DateFormatter from '@djforth/date-formatter';
 
-class DataManager {
+export default class DataManager{
   add(m){
-    //Adding comment
+    // Adding comment
     this.addToHistory();
 
     m = (_.isArray(m)) ? m : [m];
     m = this.manageDates(m);
     let current, newData;
-    if(this.data){
+    if (this.data){
       current = this.data.toJS();
       newData = _.union(current, m);
     } else {
       newData = m;
     }
 
-    this.data = Immutable.fromJS(newData).map((d)=> this.addDefaults(d));
+    this.data = Immutable.fromJS(newData).map((d)=>this.addDefaults(d));
   }
 
 
   addDates(item, keys){
-    _.forIn(item, function(v, k) {
-      if(_.contains(keys, k) && !_.isNull(item)){
+    _.forIn(item, function(v, k){
+      if (_.includes(keys, k) && !_.isNull(item)){
         let dateFmt = new DateFormatter(v);
         item[k]   = dateFmt.getDate();
         let key   = `${k}Df`;
@@ -37,8 +37,8 @@ class DataManager {
   }
 
   addDefaults(d){
-    if(this.defaults){
-      _.forIn(this.defaults, (v, k)=> d = d.set(k, v));
+    if (this.defaults){
+      _.forIn(this.defaults, (v, k)=>d = d.set(k, v));
     }
     return d;
   }
@@ -46,8 +46,8 @@ class DataManager {
   addId(){
     this.addToHistory();
     this.data = this.data.map((d)=>{
-      if(!d.has("id")){
-        d = d.set("id", _.uniqueId());
+      if (!d.has('id')){
+        d = d.set('id', _.uniqueId());
       }
 
       return d;
@@ -55,23 +55,22 @@ class DataManager {
   }
 
   addToHistory(){
-    if(this.data) {
-      this.history.push(this.data); //sets up history
+    if (this.data){
+      this.history.push(this.data); // sets up history
     }
   }
 
-  dateSearch(key, st, fn) {
+  dateSearch(key, st, fn){
     // let sort = this.sort(key);
-    if(!(_.isDate(st) && _.isDate(fn))){
+    if (!(_.isDate(st) && _.isDate(fn))){
       // console.log('No dates');
-      throw new Error("Start and finish must be dates");
+      throw new Error('Start and finish must be dates');
     }
 
     return this.data.filter((d)=>{
-      var item = d.get(key);
+      let item = d.get(key);
       return item > st && item < fn;
     });
-
   }
 
 
@@ -81,39 +80,36 @@ class DataManager {
   }
 
 
-
   constructor(defaults, ...args){
-
     this.ajaxPromises = new AjaxPromises();
     this.data         = null;
 
     this.history  = [];
     this.keys     = null;
     // this.last     = null;
-    this.cid      = _.uniqueId("c");
+    this.cid      = _.uniqueId('c');
 
     // let args = Array.prototype.slice.call(arguments);
 
     this.defaults     = defaults;
 
 
-    if(_.isArray(args[0])){
+    if (_.isArray(args[0])){
       this.add(args.shift());
     }
 
     let f   = _.last(args); // If fetch boolean set
     let fet = (_.isBoolean(f)) ? args.pop() : false;
 
-    if(args.length > 0){
+    if (args.length > 0){
       this.init(args[0], fet);
     } else {
       this.init(fet);
     }
-
   }
 
   create(data){
-    if(this.dataCheck(data)){
+    if (this.dataCheck(data)){
       this.add(data);
 
       this.setUrl();
@@ -121,20 +117,18 @@ class DataManager {
       return this.ajaxPromises.create(data).catch((err)=>{
         throw new Error(err);
       });
-
     }
 
     return null;
   }
 
   dataCheck(d){
-    if(!this.data || !d){
-      this.warn((!this.data) ? "No Data to update" : "Updates are not defined ");
-      // if(console.warn){
-      //   let warning = (!this.data) ? "No Data to update" : "Updates are not defined ";
-      //   console.warn(warning);
-      // }
-
+    if (!this.data || !d){
+      if (!this.data){
+        this.warn('No Data to update');
+      } else {
+        this.warn('Updates are not defined');
+      }
       return false;
     }
 
@@ -142,12 +136,11 @@ class DataManager {
   }
 
   destroy(id){
-    if(this.dataCheck(id)){
-
+    if (this.dataCheck(id)){
       this.setUrl();
 
       let del = this.remove(id);
-      if(del){
+      if (del){
         return this.ajaxPromises.destroy(del.toJS()).catch((err)=>{
           throw new Error(err);
         });
@@ -157,24 +150,26 @@ class DataManager {
     return null;
   }
 
-  formatDate(id, key, fmt="%d/%m/%Y"){
+  formatDate(id, key, fmt='%d/%m/%Y'){
     let item = (_.isNumber(id)) ? this.findById(id) : id;
     let df   = item.get(`${key}Df`);
     // console.log("DateFormmater", df)
-    if(df){
+    if (df){
       return df.formatDate(fmt);
     }
 
-    return "";
+    return '';
   }
 
   getDateKeys(item){
+    /* eslint-disable max-len */
     let dateRegExp   = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
+    /* eslint-enable */
     let dateKeys = [];
     _.forIn(item, (v, k)=>{
-      if(_.isString(v)){
+      if (_.isString(v)){
         let date_match = v.match(dateRegExp);
-        if(!_.isNull(date_match)){
+        if (!_.isNull(date_match)){
           dateKeys.push(k);
         }
       }
@@ -183,19 +178,19 @@ class DataManager {
     return dateKeys;
   }
 
-  each(){
-    let args = Array.prototype.slice.call(arguments);
+  each(...args){
+    // let args = Array.prototype.slice.call(arguments);
     let func    = args[0];
     let context = args[1];
-    if(!_.isFunction(func)){
-      throw new Error("Must be a function");
+    if (!_.isFunction(func)){
+      throw new Error('Must be a function');
     }
 
-    if(_.isNull(this.data)){
-      throw new Error("Please add data to iterating");
+    if (_.isNull(this.data)){
+      throw new Error('Please add data to iterating');
     }
 
-    if(context){
+    if (context){
       this.data.forEach(func.bind(context));
     } else {
       this.data.forEach(func);
@@ -203,7 +198,7 @@ class DataManager {
   }
 
   fetch(progress, clear=false){
-    if(clear){
+    if (clear){
       this.clearAll();
     }
 
@@ -218,7 +213,7 @@ class DataManager {
   }
 
   findById(id){
-    return this.data.find((d)=>  d.get("id") === id );
+    return this.data.find((d)=>d.get('id') === id );
   }
 
   findByIndex(i){
@@ -230,7 +225,7 @@ class DataManager {
   }
 
   getKeys(hard=false){
-    if(this.data.size > 0 && (!this.keys || hard)){
+    if (this.data.size > 0 && (!this.keys || hard)){
       let item  = this.data.first();
       let k     = item.keySeq();
       this.keys = k.toJS();
@@ -240,7 +235,7 @@ class DataManager {
   }
 
   init(fet){
-    if(fet){
+    if (fet){
       this.fetch();
     }
   }
@@ -253,9 +248,9 @@ class DataManager {
       date_keys = this.getDateKeys(items[i]);
       i++;
     }
-    while(_.isEmpty(date_keys) && i <  20);
+    while (_.isEmpty(date_keys) && i <  20);
 
-    if(_.isEmpty(date_keys)){
+    if (_.isEmpty(date_keys)){
       return items;
     }
 
@@ -263,17 +258,15 @@ class DataManager {
       let keys = this.getDateKeys(item);
       return this.addDates(item, keys);
     });
-
   }
 
   remove(id){
     let del = this.findById(id);
 
-    if(del){
+    if (del){
       let i     = this.data.indexOf(del);
       this.data = this.data.delete(i);
       return del;
-
     }
     this.warn("Can't find item");
     return null;
@@ -289,21 +282,19 @@ class DataManager {
   }
 
   search(val, keys){
-    if(this.dataCheck(val)){
-      let regex = new RegExp(val, "i");
+    if (this.dataCheck(val)){
+      let regex = new RegExp(val, 'i');
       return this.data.filter((d)=>{
-        if(keys.length > 1){
-
+        if (keys.length > 1){
           let values = d.filter((v, k)=>{
-            return _.contains(keys, k);
+            return _.includes(keys, k);
           });
-          let all = values.valueSeq().toJS().join(" ");
+          let all = values.valueSeq().toJS().join(' ');
 
           return (all.search(regex) > -1);
-
         } else {
           let key = keys[0];
-          if(d.has(key)){
+          if (d.has(key)){
             let value = d.get(key);
             return (String(value).search(regex) > -1);
           } else {
@@ -324,7 +315,7 @@ class DataManager {
     return this.data.sort((a, b)=>{
       let itemA = (asc) ? a.get(key) : b.get(key);
       let itemB = (asc) ? b.get(key) : a.get(key);
-      if(_.isString(itemA) && _.isString(itemB)){
+      if (_.isString(itemA) && _.isString(itemB)){
         itemA = itemA.toLowerCase();
         itemB = itemB.toLowerCase();
       }
@@ -333,7 +324,7 @@ class DataManager {
   }
 
   sortAlgorithm(itemA, itemB){
-    if(itemA < itemB) {
+    if (itemA < itemB){
       return -1;
     }
 
@@ -360,18 +351,18 @@ class DataManager {
 
 
   update(id, updates, sync=false){
-    if(this.dataCheck(updates)){
+    if (this.dataCheck(updates)){
       this.addToHistory();
       this.data = this.data.map((d)=>{
         // console.log(d)
-        if(String(d.get("id")) === String(id)){
+        if (String(d.get('id')) === String(id)){
           return this.updateItem(d, updates);
         }
 
         return d;
-      }.bind(this));
+      });
 
-      if(sync){
+      if (sync){
         this.sync(id);
       }
     }
@@ -380,26 +371,28 @@ class DataManager {
   }
 
   updateItem(item, data){
-    _.forIn(data, (v, k)=> item = item.set(k, v));
+    _.forIn(data, (v, k)=>item = item.set(k, v));
     return item;
   }
 
   updateAll(updates){
-    if(this.dataCheck(updates)){
+    if (this.dataCheck(updates)){
       this.addToHistory();
 
       this.data = this.data.map((d)=>{
         return this.updateItem(d, updates);
-      }.bind(this));
+      });
     }
     return null;
   }
 
   warn(warning){
-    if(console.warn){
+    /* eslint-disable no-console*/
+    if (console.warn){
       console.warn(warning);
     }
+    /* eslint-enable*/
   }
 }
 
-module.exports = DataManager;
+// module.exports = DataManager;

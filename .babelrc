@@ -1,0 +1,42 @@
+{
+  "presets": [
+    ["es2015", {"modules": false}],
+    "es2016",
+    "es2017",
+    "react"
+  ],
+  "env": {
+    "production": {
+      "plugins": [
+        "lodash",
+        "add-module-exports"
+      ]
+      , "presets": [
+        ["env", {
+          modules: 'umd',
+          "targets": {
+              'node': 4,
+              "browsers": [
+                "last 2 versions",
+                "chrome >= 55",
+                "IE >= 11"
+              ]
+            }
+        }]
+      ]
+    },
+    "test": {
+      "plugins": [
+        [
+          "istanbul",
+          {
+            "exclude": [
+              "**/*_spec.js"
+            ]
+          }
+        ],
+        "rewire"
+      ]
+    }
+  }
+}

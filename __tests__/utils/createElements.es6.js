@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
 exports.createHolder = function(id, path, el){
-  el   = el   || "div";
+  el   = el   || 'div';
   path = path || document.body;
 
   let  holder = document.createElement(el);
@@ -12,20 +12,19 @@ exports.createHolder = function(id, path, el){
 
 
 exports.createElement = function(path, attrs, el){
-  el   = el   || "div";
+  el   = el   || 'div';
 
   let holder = document.createElement(el);
 
-  if(attrs){
+  if (attrs){
     _.forEach(attrs, function(v, a){
       holder[a] = v;
     });
   }
 
-  if(path){
+  if (path){
     path.appendChild(holder);
   }
 
   return holder;
-
 };

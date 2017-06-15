@@ -1,477 +1,543 @@
-"use strict";
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(['module', 'exports', 'lodash/map', 'lodash/isEmpty', 'lodash/isFunction', 'lodash/isString', 'lodash/isNumber', 'lodash/isBoolean', 'lodash/last', 'lodash/isDate', 'lodash/uniqueId', 'lodash/isNull', 'lodash/includes', 'lodash/forIn', 'lodash/union', 'lodash/isArray', 'immutable', 'ajax-es6-module', '@djforth/date-formatter'], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(module, exports, require('lodash/map'), require('lodash/isEmpty'), require('lodash/isFunction'), require('lodash/isString'), require('lodash/isNumber'), require('lodash/isBoolean'), require('lodash/last'), require('lodash/isDate'), require('lodash/uniqueId'), require('lodash/isNull'), require('lodash/includes'), require('lodash/forIn'), require('lodash/union'), require('lodash/isArray'), require('immutable'), require('ajax-es6-module'), require('@djforth/date-formatter'));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod, mod.exports, global.map, global.isEmpty, global.isFunction, global.isString, global.isNumber, global.isBoolean, global.last, global.isDate, global.uniqueId, global.isNull, global.includes, global.forIn, global.union, global.isArray, global.immutable, global.ajaxEs6Module, global.dateFormatter);
+    global.dataManager = mod.exports;
+  }
+})(this, function (module, exports, _map2, _isEmpty2, _isFunction2, _isString2, _isNumber2, _isBoolean2, _last2, _isDate2, _uniqueId2, _isNull2, _includes2, _forIn2, _union2, _isArray2, _immutable, _ajaxEs6Module, _dateFormatter) {
+  'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+  var _map3 = _interopRequireDefault(_map2);
 
-var Immutable = require("immutable");
-var _ = require("lodash");
+  var _isEmpty3 = _interopRequireDefault(_isEmpty2);
 
-var AjaxPromises = require("ajax-es6-module");
-var DateFormatter = require("@djforth/date-formatter");
+  var _isFunction3 = _interopRequireDefault(_isFunction2);
 
-var DataManager = (function () {
-  _createClass(DataManager, [{
-    key: "add",
-    value: function add(m) {
-      var _this = this;
+  var _isString3 = _interopRequireDefault(_isString2);
 
-      //Adding comment
-      this.addToHistory();
+  var _isNumber3 = _interopRequireDefault(_isNumber2);
 
-      m = _.isArray(m) ? m : [m];
-      m = this.manageDates(m);
-      var current = undefined,
-          newData = undefined;
-      if (this.data) {
-        current = this.data.toJS();
-        newData = _.union(current, m);
-      } else {
-        newData = m;
-      }
+  var _isBoolean3 = _interopRequireDefault(_isBoolean2);
 
-      this.data = Immutable.fromJS(newData).map(function (d) {
-        return _this.addDefaults(d);
-      });
-    }
-  }, {
-    key: "addDates",
-    value: function addDates(item, keys) {
-      _.forIn(item, function (v, k) {
-        if (_.contains(keys, k) && !_.isNull(item)) {
-          var dateFmt = new DateFormatter(v);
-          item[k] = dateFmt.getDate();
-          var key = k + "Df";
-          item[key] = dateFmt;
-        }
-      });
+  var _last3 = _interopRequireDefault(_last2);
 
-      return item;
-    }
-  }, {
-    key: "addDefaults",
-    value: function addDefaults(d) {
-      if (this.defaults) {
-        _.forIn(this.defaults, function (v, k) {
-          return d = d.set(k, v);
-        });
-      }
-      return d;
-    }
-  }, {
-    key: "addId",
-    value: function addId() {
-      this.addToHistory();
-      this.data = this.data.map(function (d) {
-        if (!d.has("id")) {
-          d = d.set("id", _.uniqueId());
-        }
+  var _isDate3 = _interopRequireDefault(_isDate2);
 
-        return d;
-      });
-    }
-  }, {
-    key: "addToHistory",
-    value: function addToHistory() {
-      if (this.data) {
-        this.history.push(this.data); //sets up history
-      }
-    }
-  }, {
-    key: "dateSearch",
-    value: function dateSearch(key, st, fn) {
-      // let sort = this.sort(key);
-      if (!(_.isDate(st) && _.isDate(fn))) {
-        // console.log('No dates');
-        throw new Error("Start and finish must be dates");
-      }
+  var _uniqueId3 = _interopRequireDefault(_uniqueId2);
 
-      return this.data.filter(function (d) {
-        var item = d.get(key);
-        return item > st && item < fn;
-      });
-    }
-  }, {
-    key: "clearAll",
-    value: function clearAll() {
-      this.addToHistory();
-      this.data = null;
-    }
-  }]);
+  var _isNull3 = _interopRequireDefault(_isNull2);
 
-  function DataManager(defaults) {
-    _classCallCheck(this, DataManager);
+  var _includes3 = _interopRequireDefault(_includes2);
 
-    this.ajaxPromises = new AjaxPromises();
-    this.data = null;
+  var _forIn3 = _interopRequireDefault(_forIn2);
 
-    this.history = [];
-    this.keys = null;
-    // this.last     = null;
-    this.cid = _.uniqueId("c");
+  var _union3 = _interopRequireDefault(_union2);
 
-    // let args = Array.prototype.slice.call(arguments);
+  var _isArray3 = _interopRequireDefault(_isArray2);
 
-    this.defaults = defaults;
+  var _immutable2 = _interopRequireDefault(_immutable);
 
-    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
+  var _ajaxEs6Module2 = _interopRequireDefault(_ajaxEs6Module);
 
-    if (_.isArray(args[0])) {
-      this.add(args.shift());
-    }
+  var _dateFormatter2 = _interopRequireDefault(_dateFormatter);
 
-    var f = _.last(args); // If fetch boolean set
-    var fet = _.isBoolean(f) ? args.pop() : false;
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : {
+      default: obj
+    };
+  }
 
-    if (args.length > 0) {
-      this.init(args[0], fet);
-    } else {
-      this.init(fet);
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
     }
   }
 
-  _createClass(DataManager, [{
-    key: "create",
-    value: function create(data) {
-      if (this.dataCheck(data)) {
-        this.add(data);
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
 
-        this.setUrl();
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
 
-        return this.ajaxPromises.create(data)["catch"](function (err) {
-          throw new Error(err);
+  var DataManager = function () {
+    _createClass(DataManager, [{
+      key: 'add',
+      value: function add(m) {
+        var _this = this;
+
+        // Adding comment
+        this.addToHistory();
+
+        m = (0, _isArray3.default)(m) ? m : [m];
+        m = this.manageDates(m);
+        var current = void 0,
+            newData = void 0;
+        if (this.data) {
+          current = this.data.toJS();
+          newData = (0, _union3.default)(current, m);
+        } else {
+          newData = m;
+        }
+
+        this.data = _immutable2.default.fromJS(newData).map(function (d) {
+          return _this.addDefaults(d);
         });
       }
+    }, {
+      key: 'addDates',
+      value: function addDates(item, keys) {
+        (0, _forIn3.default)(item, function (v, k) {
+          if ((0, _includes3.default)(keys, k) && !(0, _isNull3.default)(item)) {
+            var dateFmt = new _dateFormatter2.default(v);
+            item[k] = dateFmt.getDate();
+            var key = k + 'Df';
+            item[key] = dateFmt;
+          }
+        });
 
-      return null;
-    }
-  }, {
-    key: "dataCheck",
-    value: function dataCheck(d) {
-      if (!this.data || !d) {
-        this.warn(!this.data ? "No Data to update" : "Updates are not defined ");
-        // if(console.warn){
-        //   let warning = (!this.data) ? "No Data to update" : "Updates are not defined ";
-        //   console.warn(warning);
-        // }
-
-        return false;
+        return item;
       }
-
-      return true;
-    }
-  }, {
-    key: "destroy",
-    value: function destroy(id) {
-      if (this.dataCheck(id)) {
-
-        this.setUrl();
-
-        var del = this.remove(id);
-        if (del) {
-          return this.ajaxPromises.destroy(del.toJS())["catch"](function (err) {
-            throw new Error(err);
+    }, {
+      key: 'addDefaults',
+      value: function addDefaults(d) {
+        if (this.defaults) {
+          (0, _forIn3.default)(this.defaults, function (v, k) {
+            return d = d.set(k, v);
           });
         }
+        return d;
       }
-
-      return null;
-    }
-  }, {
-    key: "formatDate",
-    value: function formatDate(id, key) {
-      var fmt = arguments.length <= 2 || arguments[2] === undefined ? "%d/%m/%Y" : arguments[2];
-
-      var item = _.isNumber(id) ? this.findById(id) : id;
-      var df = item.get(key + "Df");
-      // console.log("DateFormmater", df)
-      if (df) {
-        return df.formatDate(fmt);
-      }
-
-      return "";
-    }
-  }, {
-    key: "getDateKeys",
-    value: function getDateKeys(item) {
-      var dateRegExp = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
-      var dateKeys = [];
-      _.forIn(item, function (v, k) {
-        if (_.isString(v)) {
-          var date_match = v.match(dateRegExp);
-          if (!_.isNull(date_match)) {
-            dateKeys.push(k);
-          }
-        }
-      });
-
-      return dateKeys;
-    }
-  }, {
-    key: "each",
-    value: function each() {
-      var args = Array.prototype.slice.call(arguments);
-      var func = args[0];
-      var context = args[1];
-      if (!_.isFunction(func)) {
-        throw new Error("Must be a function");
-      }
-
-      if (_.isNull(this.data)) {
-        throw new Error("Please add data to iterating");
-      }
-
-      if (context) {
-        this.data.forEach(func.bind(context));
-      } else {
-        this.data.forEach(func);
-      }
-    }
-  }, {
-    key: "fetch",
-    value: function fetch(progress) {
-      var clear = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-      if (clear) {
-        this.clearAll();
-      }
-
-      this.setUrl();
-
-      return this.ajaxPromises.fetch(progress).then((function (data) {
-        this.add(data);
-        return data;
-      }).bind(this))["catch"](function (err) {
-        throw new Error(err);
-      });
-    }
-  }, {
-    key: "findById",
-    value: function findById(id) {
-      return this.data.find(function (d) {
-        return d.get("id") === id;
-      });
-    }
-  }, {
-    key: "findByIndex",
-    value: function findByIndex(i) {
-      return this.data.get(i);
-    }
-  }, {
-    key: "getAll",
-    value: function getAll() {
-      return this.data;
-    }
-  }, {
-    key: "getKeys",
-    value: function getKeys() {
-      var hard = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-
-      if (this.data.size > 0 && (!this.keys || hard)) {
-        var item = this.data.first();
-        var k = item.keySeq();
-        this.keys = k.toJS();
-      }
-
-      return this.keys;
-    }
-  }, {
-    key: "init",
-    value: function init(fet) {
-      if (fet) {
-        this.fetch();
-      }
-    }
-  }, {
-    key: "manageDates",
-    value: function manageDates(items) {
-      var _this2 = this;
-
-      var date_keys = [];
-      var i = 0;
-      // Checks first 20 records
-      do {
-        date_keys = this.getDateKeys(items[i]);
-        i++;
-      } while (_.isEmpty(date_keys) && i < 20);
-
-      if (_.isEmpty(date_keys)) {
-        return items;
-      }
-
-      return _.map(items, function (item) {
-        var keys = _this2.getDateKeys(item);
-        return _this2.addDates(item, keys);
-      });
-    }
-  }, {
-    key: "remove",
-    value: function remove(id) {
-      var del = this.findById(id);
-
-      if (del) {
-        var i = this.data.indexOf(del);
-        this.data = this.data["delete"](i);
-        return del;
-      }
-      this.warn("Can't find item");
-      return null;
-    }
-  }, {
-    key: "resetHard",
-    value: function resetHard(i) {
-      this.resetTo(i);
-      this.history = this.history.splice(0, i);
-    }
-  }, {
-    key: "resetTo",
-    value: function resetTo(i) {
-      this.data = this.history[i];
-    }
-  }, {
-    key: "search",
-    value: function search(val, keys) {
-      var _this3 = this;
-
-      if (this.dataCheck(val)) {
-        var _ret = (function () {
-          var regex = new RegExp(val, "i");
-          return {
-            v: _this3.data.filter(function (d) {
-              if (keys.length > 1) {
-
-                var values = d.filter(function (v, k) {
-                  return _.contains(keys, k);
-                });
-                var all = values.valueSeq().toJS().join(" ");
-
-                return all.search(regex) > -1;
-              } else {
-                var key = keys[0];
-                if (d.has(key)) {
-                  var value = d.get(key);
-                  return String(value).search(regex) > -1;
-                } else {
-                  return false;
-                }
-              }
-
-              return true;
-            })
-          };
-        })();
-
-        if (typeof _ret === "object") return _ret.v;
-      }
-
-      return this.data;
-    }
-  }, {
-    key: "sort",
-    value: function sort(key) {
-      var _this4 = this;
-
-      var asc = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-
-      // this.addToHistory();
-      return this.data.sort(function (a, b) {
-        var itemA = asc ? a.get(key) : b.get(key);
-        var itemB = asc ? b.get(key) : a.get(key);
-        if (_.isString(itemA) && _.isString(itemB)) {
-          itemA = itemA.toLowerCase();
-          itemB = itemB.toLowerCase();
-        }
-        return _this4.sortAlgorithm(itemA, itemB);
-      });
-    }
-  }, {
-    key: "sortAlgorithm",
-    value: function sortAlgorithm(itemA, itemB) {
-      if (itemA < itemB) {
-        return -1;
-      }
-
-      if (itemA > itemB) {
-        return 1;
-      }
-
-      return 0;
-    }
-  }, {
-    key: "setUrl",
-    value: function setUrl() {
-      var uri = _.isFunction(this.url) ? this.url() : this.url;
-      this.ajaxPromises.addUrl(uri);
-    }
-  }, {
-    key: "sync",
-    value: function sync(id) {
-      var send = this.findById(id);
-      this.setUrl();
-
-      return this.ajaxPromises.update(send.toJS(), id)["catch"](function (err) {
-        throw new Error(err);
-      });
-    }
-  }, {
-    key: "update",
-    value: function update(id, updates) {
-      var _this5 = this;
-
-      var sync = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-
-      if (this.dataCheck(updates)) {
+    }, {
+      key: 'addId',
+      value: function addId() {
         this.addToHistory();
-        this.data = this.data.map((function (d) {
-          // console.log(d)
-          if (String(d.get("id")) === String(id)) {
-            return _this5.updateItem(d, updates);
+        this.data = this.data.map(function (d) {
+          if (!d.has('id')) {
+            d = d.set('id', (0, _uniqueId3.default)());
           }
 
           return d;
-        }).bind(this));
-
-        if (sync) {
-          this.sync(id);
+        });
+      }
+    }, {
+      key: 'addToHistory',
+      value: function addToHistory() {
+        if (this.data) {
+          this.history.push(this.data); // sets up history
         }
       }
+    }, {
+      key: 'dateSearch',
+      value: function dateSearch(key, st, fn) {
+        // let sort = this.sort(key);
+        if (!((0, _isDate3.default)(st) && (0, _isDate3.default)(fn))) {
+          // console.log('No dates');
+          throw new Error('Start and finish must be dates');
+        }
 
-      return null;
-    }
-  }, {
-    key: "updateItem",
-    value: function updateItem(item, data) {
-      _.forIn(data, function (v, k) {
-        return item = item.set(k, v);
-      });
-      return item;
-    }
-  }, {
-    key: "updateAll",
-    value: function updateAll(updates) {
-      var _this6 = this;
-
-      if (this.dataCheck(updates)) {
+        return this.data.filter(function (d) {
+          var item = d.get(key);
+          return item > st && item < fn;
+        });
+      }
+    }, {
+      key: 'clearAll',
+      value: function clearAll() {
         this.addToHistory();
-
-        this.data = this.data.map((function (d) {
-          return _this6.updateItem(d, updates);
-        }).bind(this));
+        this.data = null;
       }
-      return null;
-    }
-  }, {
-    key: "warn",
-    value: function warn(warning) {
-      if (console.warn) {
-        console.warn(warning);
+    }]);
+
+    function DataManager(defaults) {
+      _classCallCheck(this, DataManager);
+
+      this.ajaxPromises = new _ajaxEs6Module2.default();
+      this.data = null;
+
+      this.history = [];
+      this.keys = null;
+      // this.last     = null;
+      this.cid = (0, _uniqueId3.default)('c');
+
+      // let args = Array.prototype.slice.call(arguments);
+
+      this.defaults = defaults;
+
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      if ((0, _isArray3.default)(args[0])) {
+        this.add(args.shift());
+      }
+
+      var f = (0, _last3.default)(args); // If fetch boolean set
+      var fet = (0, _isBoolean3.default)(f) ? args.pop() : false;
+
+      if (args.length > 0) {
+        this.init(args[0], fet);
+      } else {
+        this.init(fet);
       }
     }
-  }]);
 
-  return DataManager;
-})();
+    _createClass(DataManager, [{
+      key: 'create',
+      value: function create(data) {
+        if (this.dataCheck(data)) {
+          this.add(data);
 
-module.exports = DataManager;
+          this.setUrl();
+
+          return this.ajaxPromises.create(data).catch(function (err) {
+            throw new Error(err);
+          });
+        }
+
+        return null;
+      }
+    }, {
+      key: 'dataCheck',
+      value: function dataCheck(d) {
+        if (!this.data || !d) {
+          if (!this.data) {
+            this.warn('No Data to update');
+          } else {
+            this.warn('Updates are not defined');
+          }
+          return false;
+        }
+
+        return true;
+      }
+    }, {
+      key: 'destroy',
+      value: function destroy(id) {
+        if (this.dataCheck(id)) {
+          this.setUrl();
+
+          var del = this.remove(id);
+          if (del) {
+            return this.ajaxPromises.destroy(del.toJS()).catch(function (err) {
+              throw new Error(err);
+            });
+          }
+        }
+
+        return null;
+      }
+    }, {
+      key: 'formatDate',
+      value: function formatDate(id, key) {
+        var fmt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '%d/%m/%Y';
+
+        var item = (0, _isNumber3.default)(id) ? this.findById(id) : id;
+        var df = item.get(key + 'Df');
+        // console.log("DateFormmater", df)
+        if (df) {
+          return df.formatDate(fmt);
+        }
+
+        return '';
+      }
+    }, {
+      key: 'getDateKeys',
+      value: function getDateKeys(item) {
+        /* eslint-disable max-len */
+        var dateRegExp = new RegExp(/^\s*(\d{4})-(\d{2})-(\d{2})+!?(\s(\d{2}):(\d{2})|\s(\d{2}):(\d{2}):(\d+))?$/);
+        /* eslint-enable */
+        var dateKeys = [];
+        (0, _forIn3.default)(item, function (v, k) {
+          if ((0, _isString3.default)(v)) {
+            var date_match = v.match(dateRegExp);
+            if (!(0, _isNull3.default)(date_match)) {
+              dateKeys.push(k);
+            }
+          }
+        });
+
+        return dateKeys;
+      }
+    }, {
+      key: 'each',
+      value: function each() {
+        // let args = Array.prototype.slice.call(arguments);
+        var func = arguments.length <= 0 ? undefined : arguments[0];
+        var context = arguments.length <= 1 ? undefined : arguments[1];
+        if (!(0, _isFunction3.default)(func)) {
+          throw new Error('Must be a function');
+        }
+
+        if ((0, _isNull3.default)(this.data)) {
+          throw new Error('Please add data to iterating');
+        }
+
+        if (context) {
+          this.data.forEach(func.bind(context));
+        } else {
+          this.data.forEach(func);
+        }
+      }
+    }, {
+      key: 'fetch',
+      value: function fetch(progress) {
+        var clear = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        if (clear) {
+          this.clearAll();
+        }
+
+        this.setUrl();
+
+        return this.ajaxPromises.fetch(progress).then(function (data) {
+          this.add(data);
+          return data;
+        }.bind(this)).catch(function (err) {
+          throw new Error(err);
+        });
+      }
+    }, {
+      key: 'findById',
+      value: function findById(id) {
+        return this.data.find(function (d) {
+          return d.get('id') === id;
+        });
+      }
+    }, {
+      key: 'findByIndex',
+      value: function findByIndex(i) {
+        return this.data.get(i);
+      }
+    }, {
+      key: 'getAll',
+      value: function getAll() {
+        return this.data;
+      }
+    }, {
+      key: 'getKeys',
+      value: function getKeys() {
+        var hard = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+        if (this.data.size > 0 && (!this.keys || hard)) {
+          var item = this.data.first();
+          var k = item.keySeq();
+          this.keys = k.toJS();
+        }
+
+        return this.keys;
+      }
+    }, {
+      key: 'init',
+      value: function init(fet) {
+        if (fet) {
+          this.fetch();
+        }
+      }
+    }, {
+      key: 'manageDates',
+      value: function manageDates(items) {
+        var _this2 = this;
+
+        var date_keys = [];
+        var i = 0;
+        // Checks first 20 records
+        do {
+          date_keys = this.getDateKeys(items[i]);
+          i++;
+        } while ((0, _isEmpty3.default)(date_keys) && i < 20);
+
+        if ((0, _isEmpty3.default)(date_keys)) {
+          return items;
+        }
+
+        return (0, _map3.default)(items, function (item) {
+          var keys = _this2.getDateKeys(item);
+          return _this2.addDates(item, keys);
+        });
+      }
+    }, {
+      key: 'remove',
+      value: function remove(id) {
+        var del = this.findById(id);
+
+        if (del) {
+          var i = this.data.indexOf(del);
+          this.data = this.data.delete(i);
+          return del;
+        }
+        this.warn("Can't find item");
+        return null;
+      }
+    }, {
+      key: 'resetHard',
+      value: function resetHard(i) {
+        this.resetTo(i);
+        this.history = this.history.splice(0, i);
+      }
+    }, {
+      key: 'resetTo',
+      value: function resetTo(i) {
+        this.data = this.history[i];
+      }
+    }, {
+      key: 'search',
+      value: function search(val, keys) {
+        if (this.dataCheck(val)) {
+          var regex = new RegExp(val, 'i');
+          return this.data.filter(function (d) {
+            if (keys.length > 1) {
+              var values = d.filter(function (v, k) {
+                return (0, _includes3.default)(keys, k);
+              });
+              var all = values.valueSeq().toJS().join(' ');
+
+              return all.search(regex) > -1;
+            } else {
+              var key = keys[0];
+              if (d.has(key)) {
+                var value = d.get(key);
+                return String(value).search(regex) > -1;
+              } else {
+                return false;
+              }
+            }
+
+            return true;
+          });
+        }
+
+        return this.data;
+      }
+    }, {
+      key: 'sort',
+      value: function sort(key) {
+        var _this3 = this;
+
+        var asc = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+        // this.addToHistory();
+        return this.data.sort(function (a, b) {
+          var itemA = asc ? a.get(key) : b.get(key);
+          var itemB = asc ? b.get(key) : a.get(key);
+          if ((0, _isString3.default)(itemA) && (0, _isString3.default)(itemB)) {
+            itemA = itemA.toLowerCase();
+            itemB = itemB.toLowerCase();
+          }
+          return _this3.sortAlgorithm(itemA, itemB);
+        });
+      }
+    }, {
+      key: 'sortAlgorithm',
+      value: function sortAlgorithm(itemA, itemB) {
+        if (itemA < itemB) {
+          return -1;
+        }
+
+        if (itemA > itemB) {
+          return 1;
+        }
+
+        return 0;
+      }
+    }, {
+      key: 'setUrl',
+      value: function setUrl() {
+        var uri = (0, _isFunction3.default)(this.url) ? this.url() : this.url;
+        this.ajaxPromises.addUrl(uri);
+      }
+    }, {
+      key: 'sync',
+      value: function sync(id) {
+        var send = this.findById(id);
+        this.setUrl();
+
+        return this.ajaxPromises.update(send.toJS(), id).catch(function (err) {
+          throw new Error(err);
+        });
+      }
+    }, {
+      key: 'update',
+      value: function update(id, updates) {
+        var _this4 = this;
+
+        var sync = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        if (this.dataCheck(updates)) {
+          this.addToHistory();
+          this.data = this.data.map(function (d) {
+            // console.log(d)
+            if (String(d.get('id')) === String(id)) {
+              return _this4.updateItem(d, updates);
+            }
+
+            return d;
+          });
+
+          if (sync) {
+            this.sync(id);
+          }
+        }
+
+        return null;
+      }
+    }, {
+      key: 'updateItem',
+      value: function updateItem(item, data) {
+        (0, _forIn3.default)(data, function (v, k) {
+          return item = item.set(k, v);
+        });
+        return item;
+      }
+    }, {
+      key: 'updateAll',
+      value: function updateAll(updates) {
+        var _this5 = this;
+
+        if (this.dataCheck(updates)) {
+          this.addToHistory();
+
+          this.data = this.data.map(function (d) {
+            return _this5.updateItem(d, updates);
+          });
+        }
+        return null;
+      }
+    }, {
+      key: 'warn',
+      value: function warn(warning) {
+        /* eslint-disable no-console*/
+        if (console.warn) {
+          console.warn(warning);
+        }
+        /* eslint-enable*/
+      }
+    }]);
+
+    return DataManager;
+  }();
+
+  exports.default = DataManager;
+  module.exports = exports['default'];
+});
