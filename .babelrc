@@ -1,10 +1,5 @@
 {
-  "presets": [
-    ["es2015", {"modules": false}],
-    "es2016",
-    "es2017",
-    "react"
-  ],
+  "presets": [],
   "env": {
     "production": {
       "plugins": [
@@ -13,7 +8,7 @@
       ]
       , "presets": [
         ["env", {
-          modules: 'umd',
+          modules: "umd",
           "targets": {
               'node': 4,
               "browsers": [
@@ -23,6 +18,7 @@
               ]
             }
         }]
+        , ["minify", {mangle:false}]
       ]
     },
     "test": {
@@ -36,6 +32,21 @@
           }
         ],
         "rewire"
+      ],
+      "presets": [
+        ["es2015", {"modules": false}],
+        ["env", {
+          modules: false,
+          "targets": {
+              'node': 4,
+              "browsers": [
+                "last 2 versions",
+                "chrome >= 55",
+                "IE >= 11",
+                "phantomjs >= 2"
+              ]
+            }
+        }]
       ]
     }
   }

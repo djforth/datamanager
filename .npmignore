@@ -1,15 +1,5 @@
-<<<<<<< HEAD
 src/
 __tests__/
 .apconfig
 .babelrc
 .eslintrc.js
-=======
-
-spec/
-src/
-yarn.lock
-.apconfig
-.babelrc
-.eslintrc.js
->>>>>>> origin/webpack
