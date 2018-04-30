@@ -1,6 +1,6 @@
 {
   "name": "datamanager",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Datamanager to work with react components and flux",
   "main": "index.js",
   "scripts": {
@@ -21,9 +21,9 @@
     "@djforth/date-formatter": "^1.0.3",
     "@morsedigital/i18n_helper": "^1.1.0",
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.1",
-    "babel-loader": "^7.1.2",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "babel-loader": "^7.1.4",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-istanbul": "^4.1.5",
     "babel-plugin-lodash": "^3.2.11",
@@ -51,8 +51,8 @@
   "dependencies": {
     "@djforth/ajax-es6-fp": "^1.4.3",
     "immutable": "^3.8.2",
-    "lodash": "^4.17.4",
-    "moment": "^2.19.0",
+    "lodash": "^4.17.10",
+    "moment": "^2.20.1",
     "moment-strftime": "^0.2.3"
   }
 }
